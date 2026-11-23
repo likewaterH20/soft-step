@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#040509">
 <meta http-equiv="Cache-Control" content="no-store"><title>SOFT STEP</title>
+<meta name="description" content="A noir zombie side-scroller. One man, one cat, nobody's coming.">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/icons/icon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="assets/icons/site.webmanifest">
+<meta name="apple-mobile-web-app-title" content="SOFT STEP">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SOFT STEP">
+<meta property="og:description" content="One man. One cat. Nobody's coming. A noir zombie side-scroller you play in the browser.">
+<meta property="og:url" content="https://likewaterh20.github.io/soft-step/">
+<meta property="og:image" content="https://likewaterh20.github.io/soft-step/assets/icons/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A man in a trench coat fires two pistols while a huge black mutant cat tears through zombies on a rainy street.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://likewaterh20.github.io/soft-step/assets/icons/og.jpg">
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#040509;font-family:"Helvetica Neue",system-ui,sans-serif;
     -webkit-user-select:none;user-select:none;touch-action:none}
@@ -284,14 +300,14 @@ function build(carry){
 function reset(){ LV=0; build(); }
 let LVSAVE=null;
 function retryLevel(){ ac(); build({...LVSAVE}); G.card=3.6; G.fadeIn=.8; MODE="play"; }
-function start(){ ac(); LV=0; LVSAVE=null; build(); G.card=3.6; G.fadeIn=.8; MODE="play"; startIntro(); }
+function start(){ ac(); LV=0; LVSAVE=null; build(); startStealth(); G.card=3.6; G.fadeIn=.8; MODE="play"; startIntro(); }
 function nextLevel(){ const c={score:G.score,kills:G.kills,heads:G.heads,hp:Math.min(G.maxhp,G.hp+2),maxhp:G.maxhp,weapon:G.weapon,base:G.base,ammo:G.ammo,catsOwned:1,mut:G.mut,bestCombo:G.bestCombo,flameK:G.flameK}; LV++; LVSAVE={...c}; build(c); }
 
 // ---------- helpers ----------
 function overlap(a,b){ return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y; }
 function vis(x,w){ return (x+(w||0))>G.camX-100 && x<G.camX+W+100; }
-function addFloat(x,y,txt,c,sz){ if(G.floats.length<40)G.floats.push({x,y,txt,c,life:1,sz:sz||14}); }
-function part(k,x,y,vx,vy,life,c,r){ if(G.parts.length<340)G.parts.push({k,x,y,vx,vy,life,max:life,c,r,rot:Math.random()*6.28}); }
+function addFloat(x,y,txt,c,sz){ if(G.fin)return; if(G.floats.length<40)G.floats.push({x,y,txt,c,life:1,sz:sz||14}); }
+function part(k,x,y,vx,vy,life,c,r){ if((G.dead||G.fin||G.chaos)&&r)r*=.5; if(G.parts.length<340)G.parts.push({k,x,y,vx,vy,life,max:life,c,r,rot:Math.random()*6.28}); }
 function burstFx(x,y,c,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28,s=80+Math.random()*220; part("s",x,y,Math.cos(a)*s,Math.sin(a)*s-40,.3+Math.random()*.3,c,1.5+Math.random()*2.5); } }
 function blood(x,y,n,dir,pow){ for(let i=0;i<n;i++){ const a=(dir>0?-.5:dir<0?Math.PI+.5:-Math.PI/2)+(Math.random()-.5)*1.7, s=(90+Math.random()*260)*(pow||1);
   part("b",x,y,Math.cos(a)*s,Math.sin(a)*s-60,.5+Math.random()*.6,Math.random()<.5?"#7a1414":"#4e0c0c",1.4+Math.random()*2.6); } }
@@ -435,14 +451,15 @@ function buildingArt(sp){ const seed=Math.floor(sp.x); if(BLD[seed])return BLD[s
   for(let k=0;k<4;k++)for(let c=0;c<3;c++){ if(k===0&&c===1)continue; const ww=44, wx=cols[c]-22, top=wy-72*k-54, st=bhash(seed+k*13.1+c*7.3), s2=bhash(seed*1.7+k*5.9+c*11.3);
     lintel(wx,top,ww,k===3&&v===0); R(wx,top,ww,54,"#07090d");
     if(st<.2){ const g=x.createLinearGradient(0,top,0,top+54); g.addColorStop(0,"rgba(214,196,160,.50)"); g.addColorStop(1,"rgba(150,132,100,.42)"); R(wx+1,top+1,ww-2,52,g); const tv=s2>.55;
-      if(!tv){ x.fillStyle="rgba(8,8,10,.88)"; x.beginPath(); x.arc(wx+ww*.62,top+24,6,0,6.28); x.fill(); x.beginPath(); x.moveTo(wx+ww*.62-12,top+54); x.quadraticCurveTo(wx+ww*.62-11,top+31,wx+ww*.62,top+30); x.quadraticCurveTo(wx+ww*.62+11,top+31,wx+ww*.62+12,top+54); x.fill(); }                      // someone is still in there, watching the street
+      if(!tv){}
       else { R(wx+1,top+1,ww-2,16,"rgba(8,8,10,.6)"); for(let b=2;b<16;b+=3)R(wx+1,top+b,ww-2,1,"rgba(0,0,0,.5)"); }
-      A.lit.push({x:wx,y:top,w:ww,h:54,tv}); }
+      A.lit.push({x:wx,y:top,w:ww,h:54,tv,k,c}); }
     else if(st<.38){ R(wx+1,top+1,ww-2,52,"#15130f"); for(let b=0;b<4;b++){ const by=top+4+b*13, sk=(bhash(seed+b+k+c)-.5)*5; x.fillStyle=b%2?"#3a3329":"#2f2a22"; x.beginPath(); x.moveTo(wx-2,by+sk); x.lineTo(wx+ww+2,by-sk); x.lineTo(wx+ww+2,by-sk+9); x.lineTo(wx-2,by+sk+9); x.closePath(); x.fill(); R(wx+2,by+sk+3,1.5,1.5,"#0a0a0a"); R(wx+ww-4,by-sk+3,1.5,1.5,"#0a0a0a"); } }
     else if(st<.56){ for(let b=2;b<52;b+=3.6){ const bend=(s2>.5&&b>24&&b<40)?(b-24)*.35:0; x.fillStyle="rgba(196,202,212,.13)"; x.beginPath(); x.moveTo(wx+2,top+b); x.lineTo(wx+ww-2,top+b+bend); x.lineTo(wx+ww-2,top+b+bend+1.6); x.lineTo(wx+2,top+b+1.6); x.fill(); } }
     else if(st<.72){ R(wx+1,top+1,ww-2,52,"rgba(120,150,170,.10)"); x.fillStyle="#020203"; x.beginPath(); const hx=wx+ww*(.3+s2*.4), hy=top+18+s2*18; for(let i=0;i<9;i++){ const a=i*.698, r=(i%2?6:13)+bhash(seed+i*3+k)*7; x.lineTo(hx+Math.cos(a)*r,hy+Math.sin(a)*r); } x.closePath(); x.fill(); x.strokeStyle="rgba(210,222,236,.3)"; x.lineWidth=.8; x.beginPath(); for(let i=0;i<5;i++){ const a=i*1.26+s2; x.moveTo(hx+Math.cos(a)*9,hy+Math.sin(a)*9); x.lineTo(hx+Math.cos(a)*26,hy+Math.sin(a)*26); } x.stroke(); }
     else { R(wx+1,top+1,ww-2,52,"rgba(95,125,145,.07)"); x.fillStyle="rgba(150,152,162,.13)"; x.beginPath(); x.moveTo(wx+1,top+1); x.lineTo(wx+12,top+1); x.quadraticCurveTo(wx+9,top+30,wx+4,top+53); x.lineTo(wx+1,top+53); x.fill(); x.beginPath(); x.moveTo(wx+ww-1,top+1); x.lineTo(wx+ww-13,top+1); x.quadraticCurveTo(wx+ww-8,top+32,wx+ww-3,top+53); x.lineTo(wx+ww-1,top+53); x.fill();
       x.strokeStyle="rgba(170,195,215,.13)"; x.lineWidth=1; x.beginPath(); x.moveTo(wx+4,top+48); x.lineTo(wx+ww*.55,top+5); x.moveTo(wx+12,top+50); x.lineTo(wx+ww*.7,top+8); x.stroke(); }
+    { const Wn={x:wx,y:top,w:ww,h:54,k,c,st}; (A.wins||(A.wins=[])).push(Wn); if(st>=.56&&k>=1&&k<=2&&c!==fc&&(A.hang||(A.hang=[])).length<2&&s2>.3)A.hang.push(Wn); }
     x.strokeStyle="#31343c"; x.lineWidth=2; x.strokeRect(wx,top,ww,54); x.lineWidth=1.4; x.beginPath(); x.moveTo(wx+ww/2,top); x.lineTo(wx+ww/2,top+54); x.moveTo(wx,top+26); x.lineTo(wx+ww,top+26); x.stroke(); R(wx,top,ww,3,"rgba(0,0,0,.5)"); sill(wx,top,ww);
     if(s2<.2&&st>=.2&&c!==fc){ R(wx+7,top+38,30,17,"#3c3f46"); R(wx+7,top+38,30,1,"rgba(225,232,244,.25)"); for(let b=3;b<16;b+=3)R(wx+10,top+38+b,24,1,"#1a1b20"); const g=x.createLinearGradient(0,top+60,0,top+120); g.addColorStop(0,"rgba(0,0,0,.34)"); g.addColorStop(1,"rgba(0,0,0,0)"); R(wx+19,top+60,5,60,g); } }
   escape(6,7,"rgba(0,0,0,.34)","rgba(0,0,0,.2)"); escape(0,0,"#0d0e12","#1b1d23");
@@ -478,6 +495,7 @@ function buildingArt(sp){ const seed=Math.floor(sp.x); if(BLD[seed])return BLD[s
     const ag=x.createLinearGradient(0,btop-110,0,GROUND); ag.addColorStop(0,"rgba(52,60,78,.50)"); ag.addColorStop(.45,"rgba(40,46,62,.20)"); ag.addColorStop(1,"rgba(18,20,30,0)"); x.globalCompositeOperation="source-atop"; R(bx-PX,btop-PT,cw,ch,ag); x.globalCompositeOperation="source-over"; }
   return BLD[seed]=A; }
 function drawBuilding(sp){ const A=buildingArt(sp), t=G.t; ctx.drawImage(A.cv,A.x0,A.y0,A.cw,A.ch);
+  drawWindowDead(A,t);
   for(const L of A.lit){ const f=L.tv?.10+.34*bhash(Math.floor(t*9)+L.x):.10+.05*Math.sin(t*1.3+L.x), col=L.tv?"176,204,238":"255,216,156"; ctx.fillStyle=`rgba(${col},${f})`; ctx.fillRect(L.x+1,L.y+1,L.w-2,L.h-2); light(L.x+L.w/2,L.y+L.h/2,L.tv?58:72,L.tv?.2+f*.7:.42,col,1,.35); }
   for(const L of A.lamps){ const fl=bhash(Math.floor(t*11)+L.x)>.08?1:.25; ctx.fillStyle=`rgba(255,236,200,${.9*fl})`; ctx.fillRect(L.x-2,L.y-4,4,3); light(L.x,L.y+26,92,.6*fl,"255,226,180",1,.4); }
   for(const L of A.flood)light(L.x,L.y+26,120,.5,"235,240,255",1,.3);
@@ -740,12 +758,12 @@ function drawStreetKit(){ if(LEVEL.indoor)return; const base=GROUND-19;
     else { ctx.strokeStyle="#2a2f38"; ctx.lineWidth=3; ctx.beginPath(); for(let k=0;k<3;k++){ ctx.moveTo(x-22+k*18,base); ctx.lineTo(x-22+k*18,base-20); ctx.arc(x-16+k*18,base-20,6,3.1416,0); ctx.lineTo(x-10+k*18,base); } ctx.stroke(); } } }   // bike rack
 // darkness pass: dim everything, then let every light in the frame cut through it
 function drawLighting(dark){
-  dk.globalCompositeOperation="source-over"; dk.clearRect(0,0,DK.width,DK.height); dk.fillStyle=`rgba(4,6,14,${dark})`; dk.fillRect(0,0,DK.width,DK.height);
+  dk.globalCompositeOperation="source-over"; dk.clearRect(0,0,DK.width,DK.height); const cin=!!(G.fin||G.chaos||(G.dead&&G.death)); if(cin)dark*=.45; dk.fillStyle=`rgba(4,6,14,${dark})`; dk.fillRect(0,0,DK.width,DK.height);
   dk.globalCompositeOperation="destination-out";
   for(const L of FL){ const x=L.x/2,y=L.y/2,r=L.r/2; const g=dk.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(0,0,0,${L.a})`); g.addColorStop(1,"rgba(0,0,0,0)"); dk.fillStyle=g; dk.fillRect(x-r,y-r,r*2,r*2); }
   ctx.drawImage(DK,0,0,W,H);
   ctx.save(); ctx.globalCompositeOperation="lighter";
-  for(const L of FL){ if(!L.col||L.g<=0)continue; const r=L.r*.85, g=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); g.addColorStop(0,`rgba(${L.col},${Math.min(1,L.a*L.g*(STYLE===12?.45:1))})`); g.addColorStop(1,`rgba(${L.col},0)`); ctx.fillStyle=g; ctx.fillRect(L.x-r,L.y-r,r*2,r*2); }
+  for(const L of FL){ if(!L.col||L.g<=0)continue; const r=L.r*.85, g=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); g.addColorStop(0,`rgba(${L.col},${Math.min(1,L.a*L.g*(STYLE===12?.45:1))*(cin?.22:1)})`); g.addColorStop(1,`rgba(${L.col},0)`); ctx.fillStyle=g; ctx.fillRect(L.x-r,L.y-r,r*2,r*2); }
   ctx.restore(); }
 
 // ---------- input: move, jump, one fire button, cats ----------
@@ -754,20 +772,24 @@ const FIREK=new Set(["KeyF","KeyJ","KeyK","KeyG","KeyX","ShiftLeft","ShiftRight"
 let ANYIN=0; addEventListener("keydown",e=>{ if(!e.repeat&&!e.metaKey&&!e.ctrlKey&&e.code!=="KeyM"&&e.code!=="KeyH")ANYIN++; },true); addEventListener("mousedown",()=>ANYIN++,true); addEventListener("touchstart",()=>ANYIN++,{capture:true,passive:true});
 let jumpHeld=false, fireHeld=false, jumpBuf=0, lastDirKey="r";
 const RM=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
-function anyKey(){ if(MODE==="title"){ start(); return true; } if((G.won||G.dead)&&G.endT>(G.dead?(G.death&&G.death.alone?1.8:3.3):.9)){ if(G.dead&&LV>0&&LVSAVE)retryLevel(); else start(); return true; } return false; }
+function anyKey(){ if(MODE==="title"){ start(); return true; } if(G.dead&&G.death&&G.endT>.8&&G.endT<(G.death.alone?DCARD_ALONE:DCARD)){ G.endT=G.death.alone?DCARD_ALONE:DCARD; return true; }
+  if((G.won||G.dead)&&G.endT>(G.dead?(G.death&&G.death.alone?DCARD_ALONE:DCARD)+.4:.9)){ if(G.dead&&LV>0&&LVSAVE)retryLevel(); else start(); return true; } return false; }
 addEventListener("keydown",e=>{ if(e.repeat){ if(e.code in KMAP||FIREK.has(e.code)||JUMPK.has(e.code))e.preventDefault(); return; }
   if(e.code==="KeyM"){ setMusic(!MUSIC); return; }
   if(e.code==="KeyH"){ toggleUI(); return; }
   if(e.code==="KeyR"&&userPaused){ userPaused=false; start(); return; }
   if(e.metaKey||e.ctrlKey)return;
   if(MODE==="title"||G.won||G.dead){ if(e.code==="Enter"||JUMPK.has(e.code)||FIREK.has(e.code)){ anyKey(); e.preventDefault(); } return; }
+  if(e.code==="KeyS"||e.code==="ArrowDown"||e.code==="KeyL"){ ROLLREQ=1; e.preventDefault(); return; }
   if(e.code==="KeyP"||e.code==="Escape"){ togglePause(); e.preventDefault(); return; } if(userPaused)return;
   if(G.perk){ const k=G.perk; if(e.code==="Digit1"||e.code==="Digit2"||e.code==="Digit3")pickPerk(+e.code.slice(5)-1);
     else if(e.code in KMAP)k.sel=(k.sel+(KMAP[e.code]==="r"?1:2))%3; else if((e.code==="Enter"||JUMPK.has(e.code)||FIREK.has(e.code))&&k.t>.35)pickPerk(k.sel); e.preventDefault(); return; }
   if(JUMPK.has(e.code)){ jumpBuf=.12; jumpHeld=true; e.preventDefault(); }
   else if(FIREK.has(e.code)){ fireHeld=true; e.preventDefault(); }
   else if(e.code==="KeyC"||e.code==="KeyE"){ catAttack(); e.preventDefault(); }
-  else if(e.code in KMAP){ keys.add(KMAP[e.code]); lastDirKey=KMAP[e.code]; e.preventDefault(); } });
+  else if(e.code in KMAP){ keys.add(KMAP[e.code]); lastDirKey=KMAP[e.code]; dirTap(KMAP[e.code]); e.preventDefault(); } });
+let TAPD="", TAPT=-1e9;
+function dirTap(d){ const t=performance.now(); if(d===TAPD&&t-TAPT<270){ ROLLREQ=1; TAPT=-1e9; } else { TAPD=d; TAPT=t; } }      /* same direction twice, quickly = roll that way */
 addEventListener("keyup",e=>{ if(JUMPK.has(e.code))jumpHeld=false; if(FIREK.has(e.code))fireHeld=false; if(e.code in KMAP)keys.delete(KMAP[e.code]); });
 addEventListener("blur",()=>{ keys.clear(); fireHeld=false; jumpHeld=false; });
 canvas.addEventListener("mousedown",e=>{ e.preventDefault(); if(anyKey())return; if(userPaused)return;
@@ -794,13 +816,14 @@ addEventListener("touchend",()=>{ if(AC&&AC.state!=="running")AC.resume();
 function autoFireOn(){ if(!TOUCHMODE||!AUTOFIRE)return false; for(const z of G.zombies){ if(z.dead||z.emT>0||z.thrown||z.carried)continue; if(z.x+z.w>G.camX+10&&z.x<G.camX+VW-10)return true; } return false; }
 { const SE=$t("tStick"), BA=$t("tBase"), KN=$t("tKnob"), S={id:null,ox:0,oy:0,jumped:false};
   const rest=()=>{ const r=SE.getBoundingClientRect(); S.rx=Math.min(110,r.width*.32); S.ry=r.height-84; BA.style.left=KN.style.left=S.rx+"px"; BA.style.top=KN.style.top=S.ry+"px"; };
-  const dirTo=d=>{ keys.delete("l"); keys.delete("r"); if(d<0){ keys.add("l"); lastDirKey="l"; } else if(d>0){ keys.add("r"); lastDirKey="r"; } };
+  const dirTo=d=>{ keys.delete("l"); keys.delete("r"); if(d<0){ keys.add("l"); lastDirKey="l"; } else if(d>0){ keys.add("r"); lastDirKey="r"; } if(d!==S.d){ S.d=d; if(d)dirTap(d<0?"l":"r"); } };
   const end=e=>{ if(e.pointerId!==S.id)return; S.id=null; dirTo(0); if(S.jumped)jumpHeld=false; S.jumped=false; SE.classList.remove("live"); rest(); };
   SE.addEventListener("pointerdown",e=>{ e.preventDefault(); ANYIN++; if(anyKey())return; if(userPaused){ togglePause(); return; } if(S.id!==null)return;
     S.id=e.pointerId; try{ SE.setPointerCapture(e.pointerId); }catch(_){} const r=SE.getBoundingClientRect(); S.ox=e.clientX-r.left; S.oy=e.clientY-r.top; S.jumped=false;
     BA.style.left=KN.style.left=S.ox+"px"; BA.style.top=KN.style.top=S.oy+"px"; SE.classList.add("live"); });
   SE.addEventListener("pointermove",e=>{ if(e.pointerId!==S.id)return; const r=SE.getBoundingClientRect(); let dx=e.clientX-r.left-S.ox, dy=e.clientY-r.top-S.oy; const m=Math.hypot(dx,dy), k=m>44?44/m:1;
     KN.style.left=(S.ox+dx*k)+"px"; KN.style.top=(S.oy+dy*k)+"px"; dirTo(dx>14?1:dx<-14?-1:0);
+    if(!S.rolled&&dy>40){ S.rolled=true; ROLLREQ=1; } else if(S.rolled&&dy<18)S.rolled=false;
     if(!S.jumped&&dy<-36){ S.jumped=true; jumpBuf=.12; jumpHeld=true; } else if(S.jumped&&dy>-18){ S.jumped=false; jumpHeld=false; } });      // flick up to jump
   SE.addEventListener("pointerup",end); SE.addEventListener("pointercancel",end); SE.addEventListener("lostpointercapture",end);
   addEventListener("resize",()=>{ if(S.id===null)rest(); }); setTimeout(rest,0); }
@@ -816,7 +839,7 @@ setTimeout(syncT,0);
 const TWORDS={"ANY KEY TO SKIP":"TAP TO SKIP","A / D   MOVE":"LEFT THUMB   MOVE.   FLICK UP TO JUMP","PRESS ANY KEY":"TAP TO START",
   "HOLD F   SHOOT.   UP CLOSE IT'S A BOOT.":"HE SHOOTS ON HIS OWN.   UP CLOSE HE FIGHTS.","SPACE   JUMP.   HEADS ARE PLATFORMS.":"JUMP.   HEADS ARE PLATFORMS.",
   "FLAMETHROWER   HOLD F.   IT RUNS OUT.":"FLAMETHROWER.   IT RUNS OUT.","THE CAT IS FED.   PRESS C AND STAND BACK.":"THE CAT IS FED.   TAP CAT AND STAND BACK.",
-  "ten seconds. C to pounce.":"ten seconds. CAT to pounce.","C   SEND THE CAT":"TAP CAT   SEND IT","C   LET IT CHANGE":"TAP CAT   LET IT CHANGE","CAT   C":"CAT"};
+  "ten seconds. C to pounce.":"ten seconds. CAT to pounce.","STAY BEHIND THEM.   F   TAKE THEM QUIETLY.":"STAY BEHIND THEM.   HE DOES THE REST.","S   ROLL THROUGH THEM.   YOU COME UP SHOOTING.":"SWIPE DOWN   ROLL THROUGH THEM.","C   SEND THE CAT":"TAP CAT   SEND IT","C   LET IT CHANGE":"TAP CAT   LET IT CHANGE","CAT   C":"CAT"};
 function touchWords(s){ if(TWORDS[s])return TWORDS[s]; if(s.startsWith("SPACE  —  "))return "TAP  —  "+s.slice(10); if(s.startsWith("P  RESUME"))return "TAP ANYWHERE TO RESUME";
   if(s.startsWith("A  D  MOVE"))return "LEFT THUMB  MOVE      FLICK UP  JUMP      FIRE      CAT"; return s; }
 
@@ -859,13 +882,13 @@ function gunMuzzle(){ const p=G.p, mv=Math.abs(p.vx)>10||!p.onGround, sg=G.weapo
   if(mv){ const L=sg?51:36, a=p.aimA||0; return {x:cx+p.face*(2+Math.cos(a)*L+Math.sin(a)*4), y:p.y+p.h*.36+Math.sin(a)*L-Math.cos(a)*4, ang:p.face>0?a:Math.PI-a}; }   // running: end of the drawn gun arm
   const t=TIP[sg?"shotgun":"pistol"]; return {x:cx+p.face*t.x*p.h, y:p.y+t.y*p.h, ang:p.face>0?0:Math.PI}; }                                                   // standing: end of the barrel in the aim pose
 // auto-aim: nearest thing worth shooting, with a bias for what is in front of you. a barrel sitting in a crowd counts.
-function pickTarget(){ const p=G.p, px=p.x+p.w/2; let best=null, bs=1e9;
+function pickTarget(){ const p=G.p, px=p.x+p.w/2; let best=null, bs=1e9; if(p.atkT>0)p.mlT=G.t; const ml=G.t-(p.mlT??-9)<.32;
   for(const z of G.zombies){ if(z.dead)continue; const zx=z.x+z.w/2, d=Math.abs(zx-px); if(d>480||zx<G.camX-30||zx>G.camX+VW+30)continue;
-    const s=d*(((zx-px)*p.mface>=0)?1:1.7)+((p.atkT>0&&d<66)?420:0)+(z.thrown?900:0); if(s<bs){ bs=s; best=z; } }
+    const s=(d*(((zx-px)*p.mface>=0)?1:1.7)+((ml&&d<66)?420:0)+(z.thrown?900:0))*(z===p.aimZ?.8:1); if(s<bs){ bs=s; best=z; } } p.aimZ=best;
   for(const pl of G.platforms){ if(pl.type!=="barrels")continue; const bx=pl.x+pl.w/2, d=Math.abs(bx-px); if(d<170||d>520||(bx-px)*p.mface<0)continue;
     let n=0; for(const z of G.zombies){ if(!z.dead&&Math.abs(z.x+z.w/2-bx)<150)n++; } if(n>=3 && d<bs+260){ best=pl; bs=0; } }
   return best; }
-function aimAt(){ const p=G.p, tgt=pickTarget(); if(tgt) p.face=(tgt.x+tgt.w/2)<(p.x+p.w/2)?-1:1; const sx=p.x+p.w/2, sy=p.y+p.h*.3;
+function aimAt(){ const p=G.p, tgt=pickTarget(); if(tgt){ const tdx=(tgt.x+tgt.w/2)-(p.x+p.w/2); if(Math.abs(tdx)>10)p.face=tdx<0?-1:1; } const sx=p.x+p.w/2, sy=p.y+p.h*.3;
   let dx=p.face, dy=0; if(tgt){ dx=(tgt.x+tgt.w/2)-sx; dy=(tgt.y+tgt.h*(tgt.boss?.4:.3))-sy; if(Math.abs(dx)<24)dx=24*p.face; }
   let L=Math.hypot(dx,dy)||1; p.aimA=Math.max(-.6,Math.min(.6,Math.atan2(dy/L,Math.abs(dx/L)))); const m=gunMuzzle();
   if(tgt){ dx=(tgt.x+tgt.w/2)-m.x; dy=(tgt.y+tgt.h*(tgt.boss?.4:.3))-m.y; if(Math.abs(dx)<24)dx=24*p.face; L=Math.hypot(dx,dy)||1; }
@@ -932,7 +955,7 @@ function hrPose(name,q,cv){ const R=HR.rigs[name], K=HR.K, D=Math.PI/180; if(cv.
   const ikArm=(far,tx,ty)=>{ const s0=sh[0]-(far?3:0), r=ik2(s0,sh[1],tx,ty,R.ua.len*K,R.fa.len*K,-1), e=hrPiece(x,far?R.far.ua:R.img.ua,R.ua,s0,sh[1],r[0]); hrPiece(x,far?R.far.fa:R.img.fa,R.fa,e[0],e[1],r[1]); };
   if(name==="op")HR.nk=nk;
   if(GG&&GG.two){ const t=GG.two; x.save(); x.translate(t.x,t.y); x.rotate(t.a); x.drawImage(gunDark(q.gun),-GG.g.grip[0]*GG.gw,-GG.g.grip[1]*GG.gh,GG.gw,GG.gh); x.restore(); ikArm(true,t.x,t.y); }   // second gun, far hand
-  else if(GG)ikArm(true,GG.fore[0],GG.fore[1]); else arm(true,q.fUA,q.fFA);
+  else if(GG&&!GG.g.one)ikArm(true,GG.fore[0],GG.fore[1]); else arm(true,q.fUA,q.fFA);
   const flap=(img,a0,bend,ox)=>{ const tp=R.tail, n=3, hh=img.height/n, segL=tp.len*K/n; let jx=hx-sT*4*K-2*K+ox, jy=hy-cT*6*K, th=a0*D;
     for(let k=0;k<n;k++){ x.save(); x.translate(jx,jy); x.rotate(-th); x.drawImage(img,0,k*hh-(k?1:0),img.width,hh+2,-tp.dw*K/2,-(k?1:0),tp.dw*K,segL+3); x.restore(); jx+=Math.sin(th)*segL; jy+=Math.cos(th)*segL; th+=bend*D; } };
   if(R.tail)flap(R.far.tail,q.coatF||0,(q.coat2||0)*.9,-2.5*K);        // far side of the open coat, behind the legs
@@ -944,20 +967,22 @@ function hrPose(name,q,cv){ const R=HR.rigs[name], K=HR.K, D=Math.PI/180; if(cv.
   else arm(false,q.nUA,q.nFA);
   return cv; }
 // ease every angle toward its target so poses flow into each other; strikes and recoil snap
-function hrEase(ent,q){ const c=ent._q; if(!c){ ent._q=Object.assign({},q); return ent._q; } const a=q.snap?.85:.3; for(const k in q){ if(typeof q[k]==="number"&&k!=="snap")c[k]=(c[k]??q[k])+(q[k]-(c[k]??q[k]))*a; else c[k]=q[k]; } return c; }
+function hrEase(ent,q){ const c=ent._q; if(!c){ ent._q=Object.assign({},q); return ent._q; } const e=Math.max(.05,Math.min(1,TSC))*FDT, a=1-Math.pow(.7,e), as=1-Math.pow(.15,e), sn=q.snap; for(const k in q){ if(typeof q[k]==="number"&&k!=="snap")c[k]=(c[k]??q[k])+(q[k]-(c[k]??q[k]))*((sn===1||(sn===2&&k.charCodeAt(0)===103))?as:a); else c[k]=q[k]; } return c; }      /* snap 1 = a strike, whole body. snap 2 = recoil, the guns only: firing must never make his legs pop */
 function opParams(p,moving,armed,mph){ const t=G.t, ph=p.run/4*6.2832, c=Math.cos(ph), sn=Math.sin(ph), sp=Math.min(1,Math.abs(p.vx)/300), aim=(p.aimA||0)*57.3;
-  let q={T:1+1.2*Math.sin(t*2.4),H:0,nTH:7,nSH:-7,fTH:-7,fSH:-5,nUA:6,nFA:16,fUA:-5,fFA:12,lift:0,coat:-3+2*Math.sin(t*1.6),coat2:-2,snap:0,gx:8,gy:18,gA:40,gun:gunKey()};
+  let q={T:1+1.2*Math.sin(t*2.4),H:0,nTH:7,nSH:-7,fTH:-7,fSH:-5,nUA:6,nFA:16,fUA:-5,fFA:12,lift:0,hipX:0,coat:-3+2*Math.sin(t*1.6),coat2:-2,snap:0,gx:8,gy:18,gA:40,gun:gunKey()};
   if(!p.onGround){ const up=p.vy<0; q.T=up?8:3; q.nTH=up?42:22; q.nSH=up?-78:-34; q.fTH=up?-14:-10; q.fSH=up?-36:-20; q.nUA=28; q.nFA=46; q.fUA=-34; q.fFA=44; q.lift=up?5:2; q.coat=-18-(up?0:-30); q.coat2=up?-12:22; }
   else if(moving){ q.T=8+8*sp; q.nTH=6+44*sp*c; q.nSH=-(12+92*sp*Math.max(0,-sn))-14*sp*Math.max(0,sn); q.fTH=6-44*sp*c; q.fSH=-(12+92*sp*Math.max(0,sn))-14*sp*Math.max(0,-sn); q.nUA=-8-40*sp*c; q.nFA=74; q.fUA=-8+40*sp*c; q.fFA=74; q.lift=2.2*sp*Math.abs(sn); q.coat=-18*sp+5*sn; q.coat2=-14*sp-8*c; }
   { const g=GUNS[q.gun], on=armed||fireHeld, kk=p.kick||0, k1=g.dual&&G.side===1?0:kk, k2=g.dual&&G.side===1?kk:0;     // guns: arms locked out and on target when firing; still up and forward when not
-    if(on){ const ar=aim/57.3, ca=Math.cos(ar), sa=Math.sin(ar), hx=g.hold[0]-k1*.55, hy=g.hold[1]; q.gx=ca*hx-sa*hy; q.gy=sa*hx+ca*hy; q.gA=aim-k1*2.2; if(kk>2)q.snap=1;
-      if(g.dual){ const hx2=g.hold[0]-2.5-k2*.55, hy2=g.hold[1]-5; q.gx2=ca*hx2-sa*hy2; q.gy2=sa*hx2+ca*hy2; q.gA2=aim-k2*2.2;
+    if(on){ let nd=999; const pxc=p.x+p.w/2; for(const z of G.zombies){ if(z.dead||z.thrown)continue; const d=Math.abs(z.x+z.w/2-pxc); if(d<nd)nd=d; } const cq=q.cq=Math.max(0,Math.min(1,(150-nd)/90));      // close quarters: the guns come in tight to the chest, canted
+      const ar=aim/57.3, ca=Math.cos(ar), sa=Math.sin(ar), hx=(g.hold[0]-k1*.55)*(1-.34*cq), hy=g.hold[1]-3*cq; q.gx=ca*hx-sa*hy; q.gy=sa*hx+ca*hy; q.gA=aim-k1*2.2; if(kk>2)q.snap=2;
+      if(g.dual){ const hx2=(g.hold[0]-2.5-k2*.55)*(1-.34*(q.cq||0)), hy2=g.hold[1]-5-3*(q.cq||0); q.gx2=ca*hx2-sa*hy2; q.gy2=sa*hx2+ca*hy2; q.gA2=aim-k2*2.2;
         q.T+=7-kk*.25; q.H-=3; if(p.onGround&&!moving){ q.nTH=17; q.nSH=-12; q.fTH=-15; q.fSH=-4; } }                  // leans into it, feet planted wide
       else q.T-=kk*.4; }
     else { q.gx=g.low[0]+(moving?1.2*c:0); q.gy=g.low[1]+(moving?1.2*Math.sin(ph*2):.5*Math.sin(t*2.4))+(p.onGround?0:-3); q.gA=g.low[2]+(moving?3*sn:0)-(p.onGround?0:8);
       if(g.dual){ q.gx2=g.low[0]-3-(moving?1.2*c:0); q.gy2=g.low[1]-4.5+(moving?1.2*Math.sin(ph*2+1.6):.5*Math.sin(t*2.4+1))+(p.onGround?0:-3); q.gA2=g.low[2]-2-(moving?3*sn:0)-(p.onGround?0:8); } }
+    if(on&&moving&&p.onGround){ q.nTH=6+(q.nTH-6)*.62; q.fTH=6+(q.fTH-6)*.62; q.nSH*=.8; q.fSH*=.8; q.T=5+(q.cq||0)*3; q.lift*=.4; }      // he does not run when he shoots: a level, gliding walk
     if(!g.dual){ q.gx2=null; } }
-  if(G.swap){ const S=G.swap, k=S.t/S.dur, ox=q.gx, oy=q.gy, oa=q.gA, ox2=q.gx2, oy2=q.gy2, oa2=q.gA2;
+  if(G.fin||p.roll){} else if(G.swap){ const S=G.swap, k=S.t/S.dur, ox=q.gx, oy=q.gy, oa=q.gA, ox2=q.gx2, oy2=q.gy2, oa2=q.gA2;
     if(k<.2){ const u=k/.2; q.gun=null; q.gx2=null; q.nUA=-30-120*u; q.nFA=24; q.fUA=-20-112*u; q.fFA=24; q.T=-8*u; q.snap=1; }                    // old ones go over the shoulder
     else if(k<.5){ q.gun=null; q.gx2=null; q.nUA=-34; q.nFA=96; q.fUA=-30; q.fFA=92; q.T=9; q.H=6; }                                               // both hands under the coat
     else { const u=Math.min(1,(k-.5)/.3), e=u*u*(3-2*u); q.gx=4+(ox-4)*e; q.gy=23+(oy-23)*e; q.gA=86*(1-e)+oa*e; if(ox2!=null){ q.gx2=2+(ox2-2)*e; q.gy2=21+(oy2-21)*e; q.gA2=86*(1-e)+oa2*e; } q.T+=6*(1-e); } }
@@ -966,7 +991,7 @@ function opParams(p,moving,armed,mph){ const t=G.t, ph=p.run/4*6.2832, c=Math.co
     else if(k<.2){ const u=k/.2; q.gA=oa-52*u; q.gy=oy-3*u; if(two){ q.gA2=oa2-62*u; q.gy2=oy2-4*u; } }                                             // muzzles up, empties fall out
     else if(k<.72){ const u=(k-.2)/.52, w=Math.sin(u*3.1416); q.gx=14; q.gy=10-2*w; q.gA=-64; if(two){ q.gx2=10+5*w; q.gy2=14-4*w; q.gA2=-76+12*w; } q.T+=3; q.H+=9; }      // in at the chest, fresh ones slapped home
     else { const u=(k-.72)/.28, e=u*u*(3-2*u); q.gx=14+(ox-14)*e; q.gy=10+(oy-10)*e; q.gA=-64+(oa+64)*e; if(two){ q.gx2=10+(ox2-10)*e; q.gy2=14+(oy2-14)*e; q.gA2=-76+(oa2+76)*e; } if(u>.8)q.snap=1; } }
-  if(mph){ const ty=p.atkType, rev=(p.atkDir||p.face)!==p.face, two=q.gx2!=null;
+  if(mph){ const ty=p.atkType, rev=!!p.atkRev, two=q.gx2!=null;
     if(ty==="exec"){ if(mph===1){ q.T=14; q.nTH=22; q.nSH=-20; q.fTH=-16; q.fSH=-8; q.gx=27; q.gy=5; q.gA=24; if(two){ q.gx2=22; q.gy2=-9; q.gA2=-6; } }
       else if(mph===2){ q.T=4; q.H=-6; q.gx=24; q.gy=6; q.gA=30; if(two){ q.gx2=27; q.gy2=-13; q.gA2=-16; } else { q.gy=-10; q.gA=-14; } q.snap=1; }
       else { q.T=2; q.gx=20; q.gy=4; q.gA=0; } }
@@ -978,11 +1003,15 @@ function opParams(p,moving,armed,mph){ const t=G.t, ph=p.run/4*6.2832, c=Math.co
     else if(ty==="cross"){ if(mph===1){ q.gx2=3; q.gy2=6; q.gA2=-24; q.T=-2; } else if(mph===2){ q.gx2=39; q.gy2=-1; q.gA2=-4; q.T=22; q.nTH=24; q.nSH=-14; q.fTH=-22; q.fSH=-6; q.snap=1; } else { q.gx2=20; q.gy2=5; q.gA2=12; q.T=10; } }      // far hand comes through
     else if(ty==="kick"){ if(mph===1){ q.nTH=-16; q.nSH=-46; q.T=-5; } else if(mph===2){ q.nTH=86; q.nSH=-5; q.T=-17; q.fTH=-6; q.fSH=-6; q.snap=1; } else { q.nTH=40; q.nSH=-40; q.T=-8; } }
     else if(ty==="spin"){ if(mph===1){ q.T=-8; q.nTH=34; q.nSH=-84; q.fTH=-6; q.fSH=-12; } else if(mph===2){ q.T=-28; q.H=6; q.nTH=104; q.nSH=6; q.fTH=-12; q.fSH=-4; q.lift=2; q.snap=1; } else { q.T=-10; q.nTH=52; q.nSH=-66; } } }      // roundhouse through the whole crowd
+  if(G.stealth&&!G.intro&&!G.chaos)stealthPose(p,q,moving);
+  rollPose(p,q);
   if(G.intro)introPose(p,q);
-  if(G.hurtFlash>.36){ q.T=-18; q.H=-22; q.snap=1; }
-  { const cs=p.cs||(p.cs={a:0,v:0,b:0,bv:0}), vf=p.vx*p.face/330, air=!p.onGround, dtc=1/60,                       // the coat has weight: it trails when he runs, flares on a fall, and swings past centre when he stops
+  if(G.chaos)chaosPose(p,q);
+  if(G.fin)finPose(p,q);
+  if(G.hurtFlash>.36&&!G.fin&&!p.roll){ q.T=-18; q.H=-22; q.snap=1; }
+  { const cs=p.cs||(p.cs={a:0,v:0,b:0,bv:0}), vf=p.vx*p.face/330, air=!p.onGround, dtc=Math.min(1/30,FDT/60)*Math.max(.15,Math.min(1,TSC)),                       // the coat has weight: it trails when he runs, flares on a fall, and swings past centre when he stops
       ta=Math.max(-42,Math.min(26,-vf*30+(air?(p.vy<0?-8:-30):0)+(moving?4*c:0))), tb=-vf*12+(air?(p.vy<0?4:-16):0)+Math.sin(t*7)*3*Math.abs(vf);
-    cs.v+=(70*(ta-cs.a)-7*cs.v)*dtc; cs.a+=cs.v*dtc; cs.bv+=(50*(tb-cs.b)-5*cs.bv)*dtc; cs.b+=cs.bv*dtc; q.coat=cs.a; q.coat2=cs.b; q.coatF=cs.a*.8+3+(moving?-5*c:0); }
+    cs.v+=(70*(ta-cs.a)-7*cs.v)*dtc; cs.a+=cs.v*dtc; cs.bv+=(50*(tb-cs.b)-5*cs.bv)*dtc; cs.b+=cs.bv*dtc; q.coat=cs.a; q.coat2=cs.b; q.coatF=cs.a*.8+3+(moving?-5*c:0); if(p.roll){ q.coat=104; q.coat2=-68; q.coatF=96; cs.a=-20; cs.v=0; } }      /* in a roll the coat wraps round his legs, it does not stick out like a plank */
   return q; }
 // the zombie in the opening acts: crouched over its meal, goes dead still when it hears him, turns on the lightning, unfolds to its feet, screams, runs
 function introZ(z,q){ const I=G.intro, t=I.t, tH=IS.heard, tT=IS.turn, sm=(u)=>{ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); };
@@ -996,7 +1025,7 @@ function introZ(z,q){ const I=G.intro, t=I.t, tH=IS.heard, tT=IS.turn, sm=(u)=>{
   return q; }
 function zParams(z){ const ph=z.walk/6*6.2832, t=G.t, v=(z.var??(z.var=Math.random())), run=z.tier===1, br=z.tier===3, c=Math.cos(ph), sn=Math.sin(ph);
   let q={T:(br?24:run?26:20)+4*sn, H:br?6:16+6*v, nTH:4+(run?32:22)*c, nSH:-(8+(run?64:36)*Math.max(0,-sn)), fTH:run?4-32*c:-10-12*c, fSH:run?-(8+64*Math.max(0,sn)):-16,
-    nUA:br?14+9*sn:64+v*16+5*sn, nFA:br?26:14, fUA:br?-8-9*sn:44+v*16+5*Math.sin(ph+1.3), fFA:br?22:18, lift:run?1.4*Math.abs(sn):0, snap:0}; if(G.intro&&G.intro.z===z)return introZ(z,q);
+    nUA:br?14+9*sn:64+v*16+5*sn, nFA:br?26:14, fUA:br?-8-9*sn:44+v*16+5*Math.sin(ph+1.3), fFA:br?22:18, lift:run?1.4*Math.abs(sn):0, snap:0}; if(G.intro&&G.intro.z===z)return introZ(z,q); if(G.death&&(z.dRole||z.dCrowd))return deathZ(z,q); if(z.finLock&&G.fin&&G.fin.z===z)return finZ(z,q); if(z.sl)return sleepZ(z,q); if(z.react&&z.react.t>0)return zReact(z,q);
   if(z.atkPh===1){ q.T=-14; q.H=-18; q.nUA=-34; q.fUA=-44; q.nFA=44; q.fFA=40; }
   else if(z.atkPh===2){ q.T=38; q.H=6; q.nUA=98; q.fUA=86; q.nFA=5; q.fFA=8; q.snap=1; }
   else if(z.atkPh===3){ q.T=26; q.nUA=56; q.fUA=42; }
@@ -1008,6 +1037,7 @@ function bossParams(z){ const ph=z.walk*1.25, c=Math.cos(ph), sn=Math.sin(ph);
   if(z.state==="wind"){ q={T:-16,H:-10,nTH:34,nSH:-64,fTH:28,fSH:-58,nUA:-48,nFA:62,fUA:-54,fFA:60,lift:0,snap:0}; }
   else if(z.state==="charge"){ const p2=G.t*15, c2=Math.cos(p2), s2=Math.sin(p2); q={T:42,H:-10,nTH:6+34*c2,nSH:-(12+70*Math.max(0,-s2)),fTH:6-34*c2,fSH:-(12+70*Math.max(0,s2)),nUA:66,nFA:18,fUA:50,fFA:22,lift:2*Math.abs(s2),snap:1}; }
   else if(z.state==="stun"){ q={T:50,H:26,nTH:10,nSH:-12,fTH:-8,fSH:-8,nUA:-36,nFA:8,fUA:-44,fFA:8,lift:0,snap:0}; }
+  if(z.finLock&&G.fin&&G.fin.z===z)return finZ(z,q);
   return q; }
 function zImg(z){ const nm="z"+z.tier; if(!hrReady(nm))return z.tier===3&&z.emT<=0?tankPose(z):zFrame(z); return hrPose(nm,hrEase(z,zParams(z)),ZC); }
 function zSnap(z){ const c=zImg(z); if(!c||!c.getContext)return c; const o=mkCv(c.width,c.height); o.getContext("2d").drawImage(c,0,0); return o; }
@@ -1072,9 +1102,9 @@ function catPose(i,c){ if(catSprites()){ CP.rig=false; CP.k=1; CP.dy=0; const sp
   if(crReady("bc")){ CP.rig=true; CP.k=CR.CH/CR.rigs.bc.HT*.84; CP.dy=(CR.CH-CR.GY)/CR.CH; return catRig("bc",c); } CP.rig=false; CP.k=1; CP.dy=0; const im=IMG[CWPRE[i]+"0"].width?IMG[CWPRE[i]+"0"]:IMG[CATIMG[i]]; if(!im||!im.width)return im; const mv=c.pounce?0:Math.min(1,(c.spd||0)/120); return puppet(i,im,c.gait||0,.34*mv,CATSTRIPS,.56,.02*mv); }
 function tankPose(z){ const im=IMG.z3_0; if(!im||!im.width)return zFrame(z); const mv=(z.stagger>0||z.atkPh)?0:1; return puppet(3,im,z.walk*1.05,.20*mv,BIPED,.60,.03*mv); }
 // every character goes through here so one art style applies to all of them
-function chr(im,cx,by,h,face,rot,sx,sy,k){ if(!im||!im.width)return; const S=STYLE, z=k==="z", T=(col,a,dx,dy)=>tintSpr(im,col,a,cx+(dx||0),by+(dy||0),h,face,rot,0,sx,sy), D=()=>spr2(im,cx,by,h,face,rot,sx,sy);
+function chr(im,cx,by,h,face,rot,sx,sy,k){ if(!im||!im.width)return; const S=STYLE, z=!!k&&k[0]==="z", EC=k==="z2"?["#35e39a","#17604a"]:k==="z3"?["#d6ff3a","#5c6a16"]:k==="zb"?["#12c43a","#0b4a1c"]:["#8cff5a","#2f6a26"], T=(col,a,dx,dy)=>tintSpr(im,col,a,cx+(dx||0),by+(dy||0),h,face,rot,0,sx,sy), D=()=>spr2(im,cx,by,h,face,rot,sx,sy);
   if(S===12&&k==="c"){ T("#ffcf6b",.85,-face*2.2,-1.6); D(); }
-  else if(S===12){ if(z){ T("#8cff5a",.9,-face*2,-1.4); D(); T("#2f6a26",.16); } else { T("#a9cdf0",.66,-face*1.7,-1.3); D(); T("rgb("+STY_TOP+")",.12); } }   // graded noir + green-edged dead
+  else if(S===12){ if(z){ if(k==="zb"){ T("#d6ff3a",.55,-face*4.6,-3.2); T(EC[0],.7,-face*3.2,-2.2); } else if(k==="z3")T(EC[0],.5,-face*3.6,-2.6); T(EC[0],.9,-face*2,-1.4); D(); T(EC[1],.16); } else { T("#a9cdf0",.66,-face*1.7,-1.3); D(); T("rgb("+STY_TOP+")",.12); } }   // graded noir + green-edged dead
   else if(S===1){ T("#a9cdf0",.62,-face*1.7,-1.3); D(); T("rgb("+STY_TOP+")",.16); }                              // graded noir: cool rim, district tint
   else if(S===2){ T("rgb("+STY_BOT+")",.95,-face*2.2,-1.6); D(); T("#06070b",.88); }                         // backlit silhouette
   else if(S===3){ D(); T("#8f96a0",.5); T("rgb("+STY_TOP+")",.28); }                                         // two-tone
@@ -1109,7 +1139,7 @@ function flame(){ const p=G.p, a=aimAt(), m=a.m; p.gunCd=.03; p.gunT=.14; p.gunF
   for(const z of G.zombies){ if(z.dead)continue; const dx=(z.x+z.w/2)-m.x, dy=(z.y+z.h*.45)-m.y, along=dx*a.ux+dy*a.uy, off=Math.abs(-dx*a.uy+dy*a.ux);
     if(along>-10&&along<FLAME_RANGE+z.w/2&&off<z.h*.5+18+along*.2){ z.burn=1.1; if(!z.boss)z.stagger=Math.max(z.stagger,.05); } }
   for(const pl of G.platforms){ if(pl.push){ const dxv=(pl.x+pl.w/2)-m.x; if(dxv*p.face>0&&Math.abs(dxv)<FLAME_RANGE+pl.w/2&&m.y>pl.y-30){ const v=vst(pl); if(!v.dead){ v.dmg=Math.min(1,v.dmg+.012); v.dirty=true; v.alarm=1; if(v.dmg>=1&&v.fuse<=0)v.fuse=2.3; } } continue; } if(pl.type!=="barrels")continue; const dx=(pl.x+pl.w/2)-m.x; if(dx*p.face>0&&Math.abs(dx)<FLAME_RANGE&&Math.abs(pl.y+pl.h/2-m.y)<90){ pl.bhp=(pl.bhp??2)-.12; pl.flash=.1; if(pl.bhp<=0)explodeBarrel(pl); } }
-  G.flameSnd-=.03; if(G.flameSnd<=0){ G.flameSnd=.1; SFX.flame(); } }
+  if(Math.abs(a.uy)<.5&&Math.random()<.3)fireAt(m.x+a.ux*FLAME_RANGE*(.4+Math.random()*.6)); G.flameSnd-=.03; if(G.flameSnd<=0){ G.flameSnd=.1; SFX.flame(); } }
 // ---- close combat: he fights with whatever is free while the guns keep working. hit = when the blow lands, n = how many it can catch
 const MOVES={ jab:{t:.20,hit:.06,dmg:1,kb:300,st:.24,n:2}, cross:{t:.22,hit:.07,dmg:1,kb:380,st:.28,n:2}, kick:{t:.28,hit:.09,dmg:2,kb:680,st:.45,n:2,leg:1}, spin:{t:.36,hit:.13,dmg:2,kb:600,st:.4,n:4,both:1,leg:1,reach:74}, throw:{t:.42,hit:.17}, exec:{t:.62,hit:.30} };
 const COMBO=["jab","cross","kick","jab","cross","exec","jab","kick","throw","jab","cross","spin"];
@@ -1122,7 +1152,7 @@ function melee(){ const p=G.p; if(p.atkT>0||p.atkCd>0||G.dead||G.won)return fals
   let type=COMBO[(p.combo||0)%COMBO.length]; p.combo=(p.combo||0)+1;
   if(cnt>=4&&type!=="throw")type="spin";
   if((type==="throw"||type==="exec")&&(near.boss||near.tier===3||!p.onGround))type="kick";
-  const M=MOVES[type]; p.atkId++; p.atkType=type; p.atkT=M.t; p.atkCd=M.t+.05+(p.combo%3===0?.5:0)+(type==="spin"?.5:0); p.atkHit=false; p.atkAt=G.t; p.atkDir=(near.x+near.w/2)<px?-1:1; SFX.whoosh();
+  const M=MOVES[type]; p.atkId++; p.atkType=type; p.atkT=M.t; p.atkCd=M.t+.05+(p.combo%3===0?.5:0)+(type==="spin"?.5:0); p.atkHit=false; p.atkAt=G.t; p.atkDir=(near.x+near.w/2)<px?-1:1; if(type==="exec"||type==="throw")p.face=p.mface=p.atkDir; p.atkRev=p.atkDir!==p.face; SFX.whoosh();
   if(type==="exec"){ p.grab=near; cine(.95,1.3); }
   if(type==="throw"){ p.grab=near; let f=0, b=0; for(const z of G.zombies){ if(z.dead||z===near)continue; const dx=(z.x+z.w/2)-px; if(Math.abs(dx)<340){ if(dx*p.atkDir>0)f++; else b++; } } p.throwDir=(b>f)?-p.atkDir:p.atkDir; }
   return true; }
@@ -1144,7 +1174,8 @@ function meleeUpdate(dt){ const p=G.p; if(p.atkCd>0)p.atkCd-=dt; if(!(p.atkT>0))
   const reach=M.reach||64; let hits=0;
   for(const z of G.zombies){ if(z.dead||z.emT>0||z.fly||z.thrown||hits>=M.n)continue; if(!(z.y<p.y+p.h&&z.y+z.h>p.y+10))continue;
     const dx=(z.x+z.w/2)-px, f=dx*p.atkDir, lim=reach+z.w/2+(z.boss?20:0); if(M.both?Math.abs(dx)>lim:(f<-10||f>lim))continue;
-    hits++; const dir=dx>=0?1:-1; damageZombie(z,M.dmg,"melee",dir);
+    hits++; const dir=dx>=0?1:-1, HP=heroPts(), tip=M.leg?HP[9]:HP[5]; if(!z.boss&&hits===1&&Math.abs((tip.x+dir*z.w*.18)-(z.x+z.w/2))<34)z.x=tip.x+dir*z.w*.18-z.w/2;      // slide it onto the boot
+    z.react={k:M.leg?"gut":"head",t:.3}; G.killPow=M.leg?{vx:dir*(430+Math.random()*120),vy:-150,spin:2.3,at:0}:{vx:dir*(250+Math.random()*80),vy:-100,spin:-2.8,at:3}; damageZombie(z,M.dmg,"melee",dir); G.killPow=null; if(hits===1){ burstFx(tip.x,tip.y,"#fff4d0",6); if(M.leg)for(let i=0;i<4;i++)part("m",tip.x,tip.y,dir*(60+Math.random()*120),-20-Math.random()*50,.35,"#8a8f99",4+Math.random()*4); }
     if(!z.dead&&!z.boss){ z.kv=dir*M.kb; z.stagger=M.st; }
     burstFx(z.x+z.w/2-dir*8,p.y+p.h*(M.leg?.48:.26),"#fff4d0",5); }
   if(hits){ G.hitStop=Math.max(G.hitStop,M.leg?.05:.03); G.shake=Math.max(G.shake,M.leg?8:4); SFX.melee();
@@ -1155,7 +1186,7 @@ function thrownUpdate(z,dt){ const dir=Math.sign(z.tvx)||1; z.x+=z.tvx*dt; z.tvy
   for(const o of G.zombies){ if(o===z||o.dead||o.thrown||o.emT>0||o.fly||o.bowl===z)continue;
     if(overlap(z,o)){ o.bowl=z; z.bowlN++; damageZombie(o,o.boss?5:3,"melee",dir); if(!o.dead&&!o.boss){ o.kv=dir*540; o.stagger=.75; }
       burstFx(o.x+o.w/2,o.y+o.h*.35,"#fff4d0",5); G.shake=Math.max(G.shake,7); z.tvx*=.82; } }
-  for(const pl of G.platforms){ if(pl.push&&overlap(z,pl)){ vehHit(pl,.07,z.x+z.w/2,z.y+z.h/2,"slam"); z.tvx*=-.35; z.x+=Math.sign(z.tvx)*8; break; } }
+  for(const pl of G.platforms){ if(pl.push&&overlap(z,pl)){ if(z.vhit!==pl){ z.vhit=pl; vehHit(pl,.07,z.x+z.w/2,z.y+z.h/2,"slam"); } z.x=z.tvx>0?pl.x-z.w-1:pl.x+pl.w+1; z.tvx*=-.35; break; } }
   if(z.x<0||z.x>LEVEL.w)z.tvx*=-.4;
   if(z.y>=GROUND-z.h&&z.tvy>0){ z.y=GROUND-z.h; z.thrown=false; z.spinA=0; G.shake=Math.max(G.shake,6); SFX.thunk();
     for(let i=0;i<5;i++)part("m",z.x+z.w/2+(Math.random()-.5)*30,GROUND-4,(Math.random()-.5)*80,-20-Math.random()*40,.5,"#5a5c64",8+Math.random()*8);
@@ -1180,9 +1211,9 @@ function vehUpdate(dt){ const p=G.p;
   for(const pl of G.platforms){ if(!pl.push)continue; const v=vst(pl);
     v.rv+=(-150*v.rock-11*v.rv)*dt; v.rock+=v.rv*dt*.02; v.bv+=(-260*v.bob-15*v.bv)*dt; v.bob+=v.bv*dt; if(v.alarm>0)v.alarm-=dt;
     if(G.zombies.some(z=>z.emT>0&&z.emSpot&&z.emSpot.plat===pl)){ v.rv+=Math.sin(G.t*27)*dt*34; v.bv+=Math.sin(G.t*19)*dt*260; }      // something is climbing out of it
-    const on=p.onGround&&Math.abs((p.y+p.h)-pl.y)<12&&p.x+p.w>pl.x&&p.x<pl.x+pl.w; if(on&&!v.on){ v.bv+=95; v.rv+=((p.x+p.w/2)<(pl.x+pl.w/2)?-1:1)*1.6; } v.on=on;
+    const on=p.onGround&&p.y+p.h<GROUND-8&&p.x+p.w/2>pl.x&&p.x+p.w/2<pl.x+pl.w&&Math.abs((p.y+p.h)-platTop(pl,p.x+p.w/2))<8; if(on&&!v.on){ v.bv+=95; v.rv+=((p.x+p.w/2)<(pl.x+pl.w/2)?-1:1)*1.6; } v.on=on;
     if(pl.ramT>0&&!v.dead){ v.rv+=Math.sin(G.t*31)*dt*26; if(Math.random()<dt*16)part("m",pl.ram>0?pl.x+12:pl.x+pl.w-12,GROUND-3,-pl.ram*(30+Math.random()*50),-14-Math.random()*26,.4,"#8a94a4",5+Math.random()*5); }   // spray off the wet road
-    if(!vis(pl.x,pl.w)||v.dead&&Math.random()>.2)continue;
+    if(G.fin||G.chaos||!vis(pl.x,pl.w)||v.dead&&Math.random()>.2)continue;      // nothing burns brighter or blows up while a kill is being shown
     const hood=pl.x+pl.w*(bhash(pl.x0||1)>.5?.2:.8), top=pl.y+pl.h*.38;
     if(v.dead){ if(Math.random()<dt*9)part("m",pl.x+pl.w*(.2+Math.random()*.6),pl.y+pl.h*.3,(Math.random()-.5)*20,-36-Math.random()*40,1.4+Math.random(),"#232326",12+Math.random()*14); continue; }
     if(v.dmg>.3&&Math.random()<dt*(4+v.dmg*16))part("m",hood+(Math.random()-.5)*14,top,(Math.random()-.5)*24,-40-Math.random()*50,1+Math.random()*.8,v.dmg>.65?"#26262a":"#8c8f98",8+Math.random()*10*v.dmg+4);
@@ -1232,18 +1263,17 @@ const GTIER=["pistol","smg","shotgun"];
 function upgradeGun(nw){ const p=G.p, old=G.weapon, g=GUNS[old]||GUNS.pistol; G.base=nw; G.swap={t:0,dur:1.05,nw,done:false}; p.reload=0; p.gunCd=1.05;
   for(let i=0;i<(g.dual?2:1);i++)toss({k:"gun",g:GUNS[old]?old:"pistol",L:g.L*1.02,x:p.x+p.w/2-p.face*4,y:p.y+p.h*.2,vx:-p.face*(130+i*90+Math.random()*50),vy:-340-Math.random()*90,rot:0,vr:-p.face*(8+Math.random()*7),life:7,gz:i*4});
   banner(WPN[nw].name,"out with the old",GOLD); SFX.whoosh(); }
-function swapUpdate(dt){ const p=G.p; G.lvT=(G.lvT||0)+dt;
+function swapUpdate(dt){ const p=G.p; G.lvT=(G.lvT||0)+dt; if(G.barsOut>0)G.barsOut-=dt; if(G.stealth)return;
   if(G.swap){ const S=G.swap; S.t+=dt; p.gunCd=Math.max(p.gunCd,.06); if(!S.done&&S.t>S.dur*.5){ S.done=true; G.weapon=S.nw; G.ammo=Infinity; G.mag=WPN[S.nw].mag; p.reload=0; SFX.rack(); G.lights.push({x:p.x+p.w/2,y:p.y+p.h*.4,r:110,life:.25,max:.25,col:"255,226,180"}); } if(S.t>=S.dur)G.swap=null; return; }
   const want=LV>=1?"shotgun":((G.waveIdx>=2&&!G.arena)?"smg":"pistol");
-  if(GTIER.indexOf(want)>GTIER.indexOf(G.base||"pistol")&&G.flameT<=0&&p.onGround&&!(p.atkT>0)&&G.lvT>1.4&&G.ammo===Infinity&&!(G.card>0)&&!G.banner)upgradeGun(want); }
+  if(GTIER.indexOf(want)>GTIER.indexOf(G.base||"pistol")&&G.flameT<=0&&p.onGround&&!(p.atkT>0)&&!G.fin&&!p.roll&&G.lvT>1.4&&G.ammo===Infinity&&!(G.card>0)&&!G.banner)upgradeGun(want); }
 // ---- the opening, cut like a film: black, boots, profile + title, the thing up the street, glass, it turns, the guns, go.
 // Every shot is the live scene: a real zoom for sharpness plus a crop of the finished frame for the framing.
 let INTRO_SEEN=false; const IS={A:1.5,B:3.9,C:6.6,D:7.7,crunch:7.82,E:8.3,heard:8.5,turn:8.95,F:10.1,G:11.3,END:12.1,x0:50,x1:236,stride:21};
 function startIntro(){ if(INTRO_SEEN||LV!==0||QS.has("nointro"))return; INTRO_SEEN=true; const p=G.p, h=TIER[1].h;
   const z={x:432,y:GROUND-h,w:h*.42,h,tier:1,hp:TIER[1].hp,maxhp:TIER[1].hp,spd:TIER[1].spd,face:1,walk:0,dead:false,hitFlash:0,dz:0,stagger:0,emerge:false,emT:0,emSpot:null,fly:false,feed:false};
-  G.zombies.push(z); G.intro={t:0,z,step:-1,cut:-1,crunch:false,heard:false,turned:false,scream:false,drawn:false,racked:false,title:false,chew:0,skip:false,sh:null}; p.x=IS.x0; p.face=1; p.mface=1; G.card=0; G.spawnT=Math.max(G.spawnT||0,5);
-  try{ const im=zSnap(z); if(im&&im.width)G.corpses.push({end:1.5,im,x:z.x+z.w+6,h:z.h,w:z.w,face:1,dir:1,vx:0,t:6,head:false}); }catch(e){}                      // what it is eating
-  for(let i=0;i<5;i++)decal(z.x+z.w+20+Math.random()*50,16+Math.random()*22);
+  const z0=G.zombies.find(q=>q.sl&&q.sl.type==="feed"); if(!z0)G.zombies.push(z); G.intro={t:0,z:z0||z,step:-1,cut:-1,crunch:false,heard:false,turned:false,scream:false,drawn:false,racked:false,title:false,chew:0,skip:false,sh:null}; p.x=IS.x0; p.face=1; p.mface=1; G.card=0; G.spawnT=Math.max(G.spawnT||0,5);
+  if(!z0){ try{ const im=zSnap(z); if(im&&im.width)G.corpses.push({end:1.5,im,x:z.x+z.w+6,h:z.h,w:z.w,face:1,dir:1,vx:0,t:6,head:false}); }catch(e){} for(let i=0;i<5;i++)decal(z.x+z.w+20+Math.random()*50,16+Math.random()*22); }
   const c=G.cats[0]; if(c)c.x=IS.x0-60; }
 function introShot(t){ const I=G.intro, p=G.p, z=I.z, hx=p.x+p.w/2, zx=z.x+z.w/2, e=(a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
   if(t<IS.A)return {i:0,z:3.2,c:2.1,fx:hx+4,fy:GROUND-13};
@@ -1273,6 +1303,7 @@ function introScene(dt){ const I=G.intro, p=G.p, z=I.z, c=G.cats[0]; I.t+=dt; co
   const sh=I.sh=introShot(t); setZoom(sh.z); G.camX=Math.max(0,Math.min(LEVEL.w-VW,sh.fx-VW/2));
   if(sh.i!==I.cut){ I.cut=sh.i; I.cutT=t; if(sh.i>1&&sh.i<7)tone(46,.25,"sine",.10,30); }                                                               // a low thud under every cut
   p.px=p.x; p.py=p.y; z.px=z.x; z.py=z.y; if(c){ c.px=c.x; c.py=c.y; } G.pcam=G.camX;
+  if(G.stealth&&(t>=IS.C||I.skip)){ if(c)c.x=Math.max(c.x,p.x-56); G.intro=null; G.card=0; G.lvT=0; jumpBuf=0; G.barsOut=.7; TSC=1; if(I.skip)G.fadeIn=.4; return; }
   if(t>=IS.END||I.skip){ z.face=-1; z.feed=false; if(c)c.x=Math.max(c.x,p.x-56); G.intro=null; G.card=3.6; G.lvT=0; setZoom(1); jumpBuf=0; if(I.skip){ SFX.groan(); G.fadeIn=.5; } } }
 function introPose(p,q){ const t=G.intro.t;
   if(t<IS.crunch){ const ph=(p.x-IS.x0)/IS.stride*3.1416, c=Math.cos(ph), s=Math.sin(ph); q.gun=null; q.gx2=null;
@@ -1292,42 +1323,465 @@ function drawIntroFx(){ const I=G.intro, t=I.t, sh=I.sh; if(!sh)return;
   if(sh.i===2){ const a=Math.max(0,Math.min(1,(t-IS.B-.5)*1.6)); if(a>0){ ctx.globalAlpha=a; txt("SOFT STEP",W/2,H*.33,72,BONE,"center",800,24-6*Math.min(1,(t-IS.B-.5)/2)); ctx.fillStyle=RED; ctx.fillRect(W/2-42,H*.33+22,84*a,3); ctx.globalAlpha=1; } }
   const open=sh.i===7?Math.max(0,1-(t-IS.G)/(IS.END-IS.G)):1, bar=H*.12*open; ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar);
   if(t>2.2&&sh.i<6){ ctx.globalAlpha=.32; txt("ANY KEY TO SKIP",W-26,H-bar*.5+3,8,BONE,"right",700,3); ctx.globalAlpha=1; } }
-// ---- the mutant fights like an animal: it slaps bodies clean off the screen, bites heads off, and eats
+// ---- the mutant fights like an animal. 26 kills. Once it has hold of something, the body is a ragdoll in its jaws or under its paws: everything you see is the physics.
 function boneFx(x,y,n,dir){ for(let i=0;i<n;i++)part("c",x+(Math.random()-.5)*16,y+(Math.random()-.5)*20,(dir||0)*(120+Math.random()*260)+(Math.random()-.5)*220,-160-Math.random()*300,.7+Math.random()*.6,i%3?"#e9e3d0":"#b9b29c",1.6+Math.random()*2.2); }
 function fling(z,dir,up){ if(z.boss||z.dead)return; z.thrown=true; z.flung=true; z.carried=false; z.tvx=dir*(900+Math.random()*520); z.tvy=-(up||0)-(360+Math.random()*420); z.spinA=0; z.bowlN=0; z.y-=10; z.stagger=.3;
   boneFx(z.x+z.w/2,z.y+z.h*.4,7,dir); blood(z.x+z.w/2,z.y+z.h*.4,12,dir,1.4); }
-function catActStart(bc,z){ const f=(z.x+z.w/2)>=bc.x?1:-1; bc.face=f; let near=0; for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly)continue; const dx=((o.x+o.w/2)-bc.x)*f; if(dx>-20&&dx<150)near++; }
-  bc.actN=(bc.actN||0)+1; let k=["slap","bite","slap","eat"][bc.actN%4]; if(near>=3||z.boss||z.tier===3)k="slap";
-  bc.act={k,t:0,dur:k==="slap"?.46:k==="bite"?1.0:1.15,z,hit:false,n:0}; if(k!=="slap"){ z.carried=true; z.atkPh=0; z.kv=0; } SFX.snarl(); if(k==="slap")SFX.whoosh(); }
-function catActEnd(bc){ const A=bc.act; if(A&&A.z&&A.z.carried&&!A.z.dead){ A.z.carried=false; A.z.spinA=0; A.z.y=GROUND-A.z.h; A.z.stagger=.5; } bc.act=null; bc.actCd=.1; }
-function catAct(bc,dt){ const A=bc.act, z=A.z, f=bc.face, p=G.p, mx=bc.x+f*82, my=GROUND-64, pawX=bc.x+f*70; A.t+=dt; bc.spd=0;
-  if(A.k==="slap"){ if(!A.hit&&A.t>=.2){ A.hit=true; let n=0;
-      for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly||n>=6)continue; const dx=((o.x+o.w/2)-bc.x)*f; if(dx<-24||dx>158)continue; n++; if(o.boss||o.tier===3){ damageZombie(o,o.boss?9:8,"cat",f); if(!o.dead&&!o.boss){ o.kv=f*700; o.stagger=.8; } boneFx(o.x+o.w/2,o.y+o.h*.4,5,f); } else fling(o,f); }
-      for(let i=0;i<3;i++)G.slashes.push({x:pawX+f*(26+i*16),y:GROUND-74+i*10,life:.3,col:"#fff4d0"});
-      G.shake=Math.max(G.shake,n?15:5); if(n){ G.hitStop=Math.max(G.hitStop,.06); SFX.crack(); SFX.thunk(); if(n>1)addFloat(pawX+f*40,GROUND-110,"×"+n,GOLD,22); cine(.7,1.14); } } }
-  else if(A.k==="bite"){ if(z.dead){ catActEnd(bc); return; }
-    if(A.t<.7){ const sh=A.t>.15?Math.sin(A.t*38)*8:0; z.carried=true; z.spinA=f*1.25; z.x=mx-z.w/2+f*4+sh*f; z.y=my-z.h*.30+Math.abs(sh)*.4; z.stagger=.3; if(A.t>.15&&Math.random()<dt*26)part("g",mx,my+4,(Math.random()-.5)*120,40+Math.random()*120,.5,"#9a0f12",2+Math.random()*2);
-      if(A.t>.15&&A.n===0){ A.n=1; SFX.flesh(); SFX.crack(); G.shake=Math.max(G.shake,8); blood(mx,my,10,f,1.1); } }
-    else if(!A.hit){ A.hit=true; const R=HR.rigs["z"+z.tier], him=R&&R.img&&R.img.head;                                                  // the head comes off
-      toss({k:"head",im:(him&&him.width)?him:null,L:20,x:mx,y:my-8,vx:f*(240+Math.random()*220),vy:-560-Math.random()*120,rot:0,vr:f*(10+Math.random()*8),life:6,gz:6});
-      blood(mx,my,30,f,1.7); blood(mx,my,16,-f,1.2); gibs(mx,my,6,f); boneFx(mx,my,6,f); G.shake=Math.max(G.shake,14); G.hitStop=Math.max(G.hitStop,.08); SFX.head(); SFX.crack(); addFloat(mx,my-46,"HEAD",GOLD,16);
-      z.carried=false; z.spinA=0; z.x=mx-z.w/2; z.y=GROUND-z.h; killZombie(z,TIER[z.tier].sc*2,"crit",f); p.vicious+=.25; cine(.8,1.2); } }
-  else { if(z.dead){ catActEnd(bc); return; }                                                                                              // eat: pinned under the paws
-    z.carried=true; z.spinA=f*1.48; z.x=pawX-z.w/2-f*22; z.y=GROUND-z.h+2; z.stagger=.3;
-    const bt=[.32,.58,.84]; if(A.n<3&&A.t>=bt[A.n]){ A.n++; const bx=pawX+f*26; blood(bx,GROUND-16,14,f,1.3); gibs(bx,GROUND-14,3,f); boneFx(bx,GROUND-16,4,f); decal(bx,22+Math.random()*18); G.shake=Math.max(G.shake,8); G.hitStop=Math.max(G.hitStop,.03); SFX.flesh(); SFX.crack(); }
-    if(!A.hit&&A.t>=.98){ A.hit=true; const bx=pawX+f*26; z.carried=false; z.spinA=0; z.y=GROUND-z.h; blood(bx,GROUND-14,22,f,1.5); gibs(bx,GROUND-12,9,f); boneFx(bx,GROUND-14,10,0); decal(bx,44); killZombie(z,TIER[z.tier].sc*2,"gib",f); addFloat(bx,GROUND-70,"DEVOURED",GOLD,15); p.vicious+=.4; SFX.kill(); } }
-  if(A.t>=A.dur)catActEnd(bc); }
-// how the body moves for each attack: {dx,dy,rot,sx,sy}
-function catActPose(bc){ const A=bc.act, O={dx:0,dy:0,rot:0,sx:1,sy:1}; if(!A)return O; const t=A.t, f=bc.face;
-  if(A.k==="slap"){ if(t<.2){ const u=t/.2; O.rot=-f*.24*u; O.dy=-12*u; O.dx=-f*10*u; O.sy=1+.05*u; } else if(t<.3){ O.rot=f*.30; O.dx=f*30; O.sy=.9; O.sx=1.08; } else { const u=(t-.3)/.16; O.rot=f*.30*(1-u); O.dx=f*30*(1-u); O.sy=.9+.1*u; } }
-  else if(A.k==="bite"){ if(t<.15){ O.dx=f*18*(t/.15); O.rot=f*.10*(t/.15); } else if(t<.7){ O.dx=f*18; O.rot=f*.10+Math.sin(t*38)*.085; O.dy=-Math.abs(Math.sin(t*19))*4; } else { const u=Math.min(1,(t-.7)/.12), v=Math.max(0,(t-.82)/.18); O.dx=f*18*(1-v); O.rot=-f*.34*u*(1-v); O.dy=-10*u*(1-v); } }
-  else { const pulse=[.32,.58,.84].reduce((m,b)=>Math.max(m,Math.max(0,1-Math.abs(t-b)/.09)),0); O.rot=f*(.2+.13*pulse); O.dx=f*8; O.sy=1-.07*pulse; O.dy=3*pulse; }
-  return O; }
+function kf(t,a){ let p=a[0]; if(t<=p[0])return p[1]; for(let i=1;i<a.length;i++){ const n=a[i]; if(t<n[0]){ const u=(t-p[0])/(n[0]-p[0]), o={}; for(const k in n[1]){ const d=k[0]==="s"?1:0, v0=p[1][k]??d; o[k]=v0+(n[1][k]-v0)*u; } for(const k in p[1])if(!(k in o))o[k]=p[1][k]; return o; } p=n; } return p[1]; }
+const REAR=[[0,{}],[.18,{rot:-.24,dy:-12,dx:-10,sy:1.05}],[.22,{rot:.3,dx:30,sy:.9,sx:1.08}],[.34,{rot:.3,dx:30,sy:.9}],[.48,{}]];
+function catM(bc){ const O=catActPose(bc), f=bc.face; return {x:bc.x+f*82+O.dx,y:GROUND-64+O.dy+O.rot*f*70,px:bc.x+f*70+O.dx,py:GROUND-5,f}; }
+function cOnce(A,key,t){ if(A.t>=t&&!A.st[key]){ A.st[key]=1; return true; } return false; }
+function cGrab(A){ if(A.c||A.z.dead)return A.c; const z=A.z; z.carried=false; A.c=ragKill(z,A.f,{vx:0,vy:0,spin:0,mult:2}); if(A.c)A.c.rag.hold=true; SFX.flesh(); return A.c; }
+function cPin(A,i,x,y,k){ if(A.c)A.c.rag.pins.push({i,x,y,k:k||.6}); }
+function cGone(A){ if(A.c){ const i=G.corpses.indexOf(A.c); if(i>=0)G.corpses.splice(i,1); A.c=null; } }
+function cWord(A,bc,w){ addFloat(bc.x+A.f*60,GROUND-120,w,GOLD,16); }
+function cFront(bc,f,r,fn,max){ let n=0; for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly||o.carried||n>=(max||6))continue; const dx=((o.x+o.w/2)-bc.x)*f; if(dx<-24||dx>r)continue; n++; fn(o); } return n; }
+function cSlapAll(A,bc,f,r){ const n=cFront(bc,f,r||158,o=>{ if(o.boss||o.tier===3){ damageZombie(o,o.boss?9:8,"cat",f); if(!o.dead&&!o.boss){ o.kv=f*700; o.stagger=.8; } boneFx(o.x+o.w/2,o.y+o.h*.4,5,f); } else fling(o,f); });
+  for(let i=0;i<3;i++)G.slashes.push({x:bc.x+f*(96+i*16),y:GROUND-74+i*10,life:.3,col:"#fff4d0"}); G.shake=Math.max(G.shake,n?15:5); if(n){ G.hitStop=Math.max(G.hitStop,.06); SFX.crack(); SFX.thunk(); if(n>1)addFloat(bc.x+f*110,GROUND-110,"×"+n,GOLD,22); } return n; }
+function cBite(m,f,n){ blood(m.x,m.y,n||12,f,1.3); SFX.flesh(); SFX.crack(); G.shake=Math.max(G.shake,8); }
+const CKILL=[
+ {n:"slap",multi:1,dur:.48,pose:t=>kf(t,REAR),run:(A,bc)=>{ if(cOnce(A,"h",.2))cSlapAll(A,bc,A.f); }},
+ {n:"doubleslap",multi:1,dur:.95,pose:t=>kf(t%.48,REAR),run:(A,bc)=>{ if(cOnce(A,"h",.2))cSlapAll(A,bc,A.f); if(cOnce(A,"turn",.48)){ bc.face=-bc.face; A.f=bc.face; SFX.whoosh(); } if(cOnce(A,"h2",.68))cSlapAll(A,bc,A.f); }},
+ {n:"groundpound",multi:1,dur:.8,pose:t=>kf(t,[[0,{}],[.3,{rot:-.5,dy:-34,dx:-12}],[.4,{rot:.22,dy:6,sy:.86,sx:1.1}],[.6,{rot:.1,sy:.94}],[.8,{}]]),
+   run:(A,bc)=>{ if(cOnce(A,"h",.4)){ let n=0; for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly||o.carried)continue; const dx=(o.x+o.w/2)-bc.x; if(Math.abs(dx)>230)continue; n++; if(o.boss||o.tier===3){ damageZombie(o,8,"cat",Math.sign(dx)||1); } else fling(o,Math.sign(dx)||1,520); }
+     for(let i=0;i<14;i++)part("m",bc.x+(Math.random()-.5)*260,GROUND-4,(Math.random()-.5)*300,-40-Math.random()*90,.6,"#6a6c74",9+Math.random()*10); for(let i=-2;i<=2;i++)G.slashes.push({x:bc.x+i*70,y:GROUND-20,life:.3,col:"#fff4d0"}); G.shake=Math.max(G.shake,22); G.hitStop=Math.max(G.hitStop,.07); SFX.boom(); SFX.crack(); if(n>1)addFloat(bc.x,GROUND-130,"×"+n,GOLD,24); } }},
+ {n:"tailwhip",multi:1,dur:.75,pose:t=>kf(t,[[0,{}],[.2,{sx:1,dy:-6}],[.32,{sx:.1,dy:-10}],[.44,{sx:-1,dy:-10}],[.56,{sx:.1,dy:-6}],[.68,{sx:1}],[.75,{}]]),
+   run:(A,bc)=>{ if(cOnce(A,"w",.2))SFX.whoosh(); if(cOnce(A,"h",.4)){ let n=0; for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly||o.carried)continue; const dx=(o.x+o.w/2)-bc.x; if(Math.abs(dx)>175)continue; n++; if(o.boss||o.tier===3)damageZombie(o,7,"cat",Math.sign(dx)||1); else fling(o,Math.sign(dx)||1,80); } G.shake=Math.max(G.shake,14); if(n){ SFX.crack(); SFX.thunk(); G.hitStop=Math.max(G.hitStop,.05); if(n>1)addFloat(bc.x,GROUND-120,"×"+n,GOLD,22); } } }},
+ {n:"roar",multi:1,dur:1.0,pose:t=>kf(t,[[0,{}],[.12,{rot:-.16,sx:1.08,sy:1.06,dy:-6}],[.4,{rot:-.16,sx:1.1,sy:1.06,dy:-6}],[.5,{rot:.12,dx:56}],[.72,{rot:.12,dx:56}],[1,{}]]),
+   run:(A,bc,dt,m)=>{ if(cOnce(A,"r",.1)){ SFX.roar(); G.shake=Math.max(G.shake,12); for(const o of G.zombies){ if(o.dead||o.boss)continue; const dx=(o.x+o.w/2)-bc.x; if(Math.abs(dx)<320){ o.stagger=Math.max(o.stagger,1.2); o.kv=Math.sign(dx)*260; o.atkPh=0; } } for(let i=0;i<3;i++)G.slashes.push({x:bc.x+A.f*(120+i*40),y:GROUND-70,life:.3,col:GOLD}); }
+     if(cOnce(A,"b",.52)&&!A.z.dead&&!A.z.boss&&A.z.tier<3&&Math.abs((A.z.x+A.z.w/2)-m.x)<110){ if(cGrab(A)){ A.c.rag.noHead=true; cBite(m,A.f,26); gibs(m.x,m.y,5,A.f); SFX.head(); cWord(A,bc,"HEAD"); ragPush(A.c,A.f*120,-160); } } else if(A.st.b&&!A.st.s&&!A.c){ A.st.s=1; cSlapAll(A,bc,A.f,190); } }},
+ {n:"headbite",dur:1.0,pose:(t)=>kf(t,[[0,{}],[.15,{dx:18,rot:.1}],[.7,{dx:18,rot:.1}],[.8,{dx:10,rot:-.34,dy:-10}],[1,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.15)cGrab(A); if(A.c&&A.t<.7){ const sh=Math.sin(A.t*38)*16; cPin(A,3,m.x+sh*A.f,m.y+Math.abs(sh)*.4,.75); if(cOnce(A,"c",.2))cBite(m,A.f); if(Math.random()<dt*20)part("g",m.x,m.y+4,(Math.random()-.5)*120,40+Math.random()*120,.5,"#9a0f12",2+Math.random()*2); }
+     if(A.c&&cOnce(A,"rip",.7)){ A.c.rag.noHead=true; headToss(A.z,m.x,m.y-8,A.f*(240+Math.random()*220),-600,A.f*14); cBite(m,A.f,30); gibs(m.x,m.y,6,A.f); boneFx(m.x,m.y,6,A.f); SFX.head(); G.hitStop=Math.max(G.hitStop,.08); G.shake=Math.max(G.shake,14); cWord(A,bc,"HEAD"); ragPush(A.c,-A.f*60,-80); } }},
+ {n:"devour",dur:1.15,pose:t=>{ const pu=[.32,.58,.84].reduce((mx,b)=>Math.max(mx,Math.max(0,1-Math.abs(t-b)/.09)),0); return {rot:.2+.13*pu,dx:8,sy:1-.07*pu,dy:3*pu}; },
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c){ cPin(A,1,m.px+A.f*20,m.py,.7); cPin(A,0,m.px-A.f*16,m.py,.5); for(const [k,t] of [["a",.32],["b",.58],["c",.84]])if(cOnce(A,k,t)){ const bx=m.px+A.f*26; blood(bx,GROUND-16,14,A.f,1.3); gibs(bx,GROUND-14,3,A.f); boneFx(bx,GROUND-16,4,A.f); decal(bx,22+Math.random()*18); cBite({x:bx,y:GROUND-14},A.f,4); G.hitStop=Math.max(G.hitStop,.03); }
+       if(cOnce(A,"gone",.98)){ const bx=m.px+A.f*26; cGone(A); blood(bx,GROUND-14,22,A.f,1.5); gibs(bx,GROUND-12,9,A.f); boneFx(bx,GROUND-14,10,0); decal(bx,44); SFX.kill(); cWord(A,bc,"DEVOURED"); } } }},
+ {n:"facerip",dur:.95,pose:t=>kf(t,[[0,{}],[.15,{dx:20,rot:.08}],[.5,{dx:20,rot:.08}],[.58,{dx:-6,rot:-.26,dy:-8}],[.95,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.15)cGrab(A); if(A.c&&A.t<.5){ cPin(A,3,m.x+Math.sin(A.t*30)*5,m.y,.8); if(cOnce(A,"c",.2))cBite(m,A.f,8); }
+     if(A.c&&cOnce(A,"rip",.5)){ A.c.rag.faceOff=true; A.c.rag.bake=null; toss({k:"clip",c:"#9c1418",x:m.x,y:m.y,vx:-A.f*180,vy:-420,rot:0,vr:18,life:6,gz:6}); cBite(m,A.f,26); gibs(m.x,m.y,4,-A.f); G.hitStop=Math.max(G.hitStop,.08); G.shake=Math.max(G.shake,13); ragPush(A.c,A.f*260,-200); cWord(A,bc,"FACE OFF"); } }},
+ {n:"ragshake",dur:1.25,pose:t=>({dx:14,rot:t<1?Math.sin(t*26)*.22:0,dy:-Math.abs(Math.sin(t*13))*8}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<1){ cPin(A,1,m.x+Math.sin(A.t*26)*46*A.f,m.y+Math.cos(A.t*26)*20,.8); if(Math.random()<dt*24)blood(m.x,m.y,2,Math.random()<.5?1:-1,1.2); if(cOnce(A,"c",.2))cBite(m,A.f); if(cOnce(A,"c2",.6))SFX.crack(); }
+     if(A.c&&cOnce(A,"go",1)){ ragPush(A.c,A.f*980,-360); SFX.whoosh(); boneFx(m.x,m.y,5,A.f); cWord(A,bc,"RAG DOLL"); } }},
+ {n:"juggle",dur:1.35,pose:t=>kf(t,[[0,{}],[.15,{rot:-.3,dy:-14}],[.3,{rot:-.1}],[.55,{rot:-.34,dy:-18}],[.7,{rot:-.1}],[.85,{rot:-.34,dy:-18}],[1.1,{rot:.26,dx:30}],[1.35,{}]]),
+   run:(A,bc,dt,m)=>{ const hit=(vx,vy)=>{ if(!A.c)return; ragPush(A.c,vx,vy); const b=A.c.rag.pts[1]; blood(b.x,b.y,10,A.f,1.3); G.slashes.push({x:b.x,y:b.y,life:.3,col:"#fff4d0"}); SFX.thunk(); SFX.crack(); G.shake=Math.max(G.shake,9); };
+     if(cOnce(A,"a",.15)){ cGrab(A); hit(0,-940); } if(cOnce(A,"b",.55))hit(A.f*40,-820); if(cOnce(A,"c",.85))hit(-A.f*30,-760); if(cOnce(A,"d",1.1)){ hit(A.f*1250,-140); if(A.c)boneFx(A.c.rag.pts[1].x,A.c.rag.pts[1].y,8,A.f); cWord(A,bc,"×4 JUGGLE"); } }},
+ {n:"hulkslam",dur:1.2,pose:t=>({dx:10,rot:t<1.05?Math.sin((t-.12)*12.5)*.34:0,dy:-6}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<1.05){ const a=(A.t-.12)*12.5, sx=Math.sin(a), up=Math.abs(Math.cos(a)); cPin(A,9,bc.x+A.f*(40+sx*70),GROUND-30-up*90,.85); const k=Math.floor((a+1.57)/3.1416); if(k!==A.st.k&&A.t>.3){ A.st.k=k; const b=A.c.rag.pts[1]; ragPush(A.c,0,760); blood(b.x,GROUND-10,12,0,1.4); for(let i=0;i<5;i++)part("m",b.x+(Math.random()-.5)*40,GROUND-4,(Math.random()-.5)*120,-30-Math.random()*40,.5,"#6a6c74",7+Math.random()*7); decal(b.x,26); SFX.thunk(); SFX.crack(); G.shake=Math.max(G.shake,13); G.hitStop=Math.max(G.hitStop,.04); } }
+     if(A.c&&cOnce(A,"go",1.05)){ ragPush(A.c,-A.f*300,-240); cWord(A,bc,"SLAMMED"); } }},
+ {n:"swallow",dur:1.3,pose:t=>kf(t,[[0,{}],[.15,{dx:18,rot:.1}],[.3,{dx:10,rot:-.36,dy:-10}],[.75,{dx:10,rot:-.4,dy:-12}],[.85,{sy:.92,sx:1.06}],[1,{rot:.14,dx:14}],[1.3,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.15)cGrab(A); if(A.c&&A.t<.75){ const k=Math.min(.9,.3+A.t); for(const i of [3,2,1,0,9,11,5,7])cPin(A,i,m.x,m.y+6,k*.6); if(cOnce(A,"c",.3))cBite(m,A.f,10); }
+     if(cOnce(A,"gulp",.75)){ cGone(A); tone(120,.18,"sine",.2,60); SFX.flesh(); G.shake=Math.max(G.shake,6); } if(cOnce(A,"spit",1.0)){ boneFx(m.x,m.y,16,A.f); for(let i=0;i<5;i++)toss({k:"clip",c:"#e8dcc4",x:m.x,y:m.y,vx:A.f*(160+Math.random()*260),vy:-200-Math.random()*200,rot:0,vr:20,life:8,gz:i*3}); SFX.crack(); cWord(A,bc,"SWALLOWED"); } }},
+ {n:"drag",dur:1.15,pose:t=>({dx:10,rot:.12,dy:-Math.abs(Math.sin(t*22))*5}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.95){ bc.x=Math.max(G.camX+60,Math.min(G.camX+VW-60,bc.x+A.f*300*dt)); cPin(A,3,m.x,GROUND-22,.8); const b=A.c.rag.pts[0]; if(Math.random()<dt*30)decal(b.x,10+Math.random()*12); if(Math.random()<dt*16)blood(b.x,GROUND-8,2,-A.f,.8); if(cOnce(A,"c",.2))cBite(m,A.f); }
+     if(A.c&&cOnce(A,"go",.95)){ ragPush(A.c,A.f*640,-560); SFX.whoosh(); cWord(A,bc,"DRAGGED"); } }},
+ {n:"headpop",dur:.95,pose:t=>kf(t,[[0,{}],[.15,{dx:14,rot:.1}],[.45,{dx:14,rot:-.16,dy:-10}],[.55,{dx:18,rot:.3,dy:6,sy:.9}],[.8,{rot:.2}],[.95,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c){ cPin(A,3,m.px+A.f*14,GROUND-3,.8); cPin(A,1,m.px-A.f*8,GROUND-3,.4); if(cOnce(A,"pop",.55)){ const h=A.c.rag.pts[3]; A.c.rag.noHead=true; A.c.rag.bake=null; blood(h.x,h.y,34,0,2); gibs(h.x,h.y,12,0); boneFx(h.x,h.y,9,0); decal(h.x,36); SFX.head(); SFX.thunk(); G.shake=Math.max(G.shake,16); G.hitStop=Math.max(G.hitStop,.08); cWord(A,bc,"POP"); } } }},
+ {n:"flurry",dur:.95,pose:t=>({dx:16+Math.sin(t*70)*6,rot:Math.sin(t*35)*.14,dy:-4}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.1)cGrab(A); const k=Math.floor((A.t-.15)/.09); if(A.c&&k>=0&&k<7&&k!==A.st.k){ A.st.k=k; const b=A.c.rag.pts[1]; cPin(A,1,m.x,m.y+10,.5); G.slashes.push({x:b.x+(Math.random()-.5)*30,y:b.y+(Math.random()-.5)*30,life:.25,col:"#fff4d0"}); blood(b.x,b.y,9,k%2?1:-1,1.4); gibs(b.x,b.y,2,k%2?1:-1); ragPush(A.c,(k%2?1:-1)*90,-120); SFX.whoosh(); if(k%2)SFX.flesh(); G.shake=Math.max(G.shake,6); } else if(A.c&&A.t<.8)cPin(A,1,m.x,m.y+10,.5);
+     if(A.c&&cOnce(A,"end",.8)){ const b=A.c.rag.pts[1]; cGone(A); gibs(b.x,b.y,16,0); boneFx(b.x,b.y,14,0); blood(b.x,b.y,30,0,2); decal(b.x,46); SFX.kill(); SFX.crack(); G.shake=Math.max(G.shake,15); G.hitStop=Math.max(G.hitStop,.07); cWord(A,bc,"SHREDDED"); } }},
+ {n:"pluck",dur:1.25,pose:t=>({dx:12,rot:.14+([.35,.6,.88].some(b=>Math.abs(t-b)<.06)?-.3:0),dy:0}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c){ cPin(A,0,m.px,GROUND-6,.6); cPin(A,1,m.px+A.f*16,GROUND-8,.5); const rip=(key,t,part)=>{ if(cOnce(A,key,t)){ const gi=ragRip(A.c,part); const s=A.c.rag.pts[RIPS[part].from]; blood(s.x,s.y,18,-A.f,1.6); boneFx(s.x,s.y,5,-A.f); SFX.crack(); SFX.flesh(); G.shake=Math.max(G.shake,10); G.hitStop=Math.max(G.hitStop,.05); if(gi!=null){ const g=A.c.rag.pts[gi]; g.vx=-A.f*(300+Math.random()*200); g.vy=-520; } } };
+       rip("a",.35,"nArm"); rip("b",.6,"fArm"); if(cOnce(A,"h",.88)){ A.c.rag.noHead=true; A.c.rag.bake=null; headToss(A.z,m.x,m.y,-A.f*220,-560,-A.f*12); cBite(m,A.f,22); SFX.head(); cWord(A,bc,"PLUCKED"); } } }},
+ {n:"spinerip",dur:1.0,pose:t=>kf(t,[[0,{}],[.15,{dx:18,rot:.14}],[.5,{dx:18,rot:.14}],[.6,{dx:0,rot:-.4,dy:-16}],[.85,{rot:-.3,dy:-10}],[1,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.55){ cPin(A,2,m.x,m.y+6,.8); if(cOnce(A,"c",.2))cBite(m,A.f); }
+     if(A.c&&cOnce(A,"rip",.55)){ const b=A.c.rag.pts[1]; for(let i=0;i<8;i++)toss({k:"clip",c:"#e8dcc4",x:m.x-A.f*i*3,y:m.y-i*5,vx:-A.f*(40+i*14),vy:-560+i*30,rot:0,vr:6+i,life:8,gz:i*2}); blood(b.x,b.y,30,0,2); boneFx(b.x,b.y,12,-A.f); SFX.crack(); SFX.crack(); SFX.head(); G.shake=Math.max(G.shake,15); G.hitStop=Math.max(G.hitStop,.09); ragPush(A.c,A.f*40,260); cWord(A,bc,"SPINE"); } }},
+ {n:"pull",dur:1.3,pose:t=>kf(t,[[0,{}],[.15,{dx:14,rot:.12}],[.3,{dx:4,rot:-.36,dy:-12}],[.5,{rot:-.1}],[1.3,{}]]),
+   run:(A,bc,dt,m)=>{ const p=G.p, hx=p.x+p.w/2; if(A.t>=.12)cGrab(A); if(A.c&&A.t<.3)cPin(A,1,m.x,m.y,.8);
+     if(A.c&&cOnce(A,"up",.3)){ const b=A.c.rag.pts[1]; ragPush(A.c,(hx-b.x)*.9,-900); SFX.whoosh(); cWord(A,bc,"PULL!"); }
+     for(const [k,t] of [["s1",.62],["s2",.76],["s3",.9],["s4",1.04]])if(A.c&&cOnce(A,k,t)){ const b=A.c.rag.pts[1], mz=gunMuzzle(); gunFlash(mz.x,mz.y); p.gunT=.2; p.kick=4; G.muzzle=.05; ragPush(A.c,Math.sign(b.x-hx||1)*150,-300); blood(b.x,b.y,12,Math.sign(b.x-hx||1),1.4); if(k==="s4"){ gibs(b.x,b.y,9,0); boneFx(b.x,b.y,7,0); } } }},
+ {n:"leapthrough",dur:.8,pose:t=>kf(t,[[0,{}],[.12,{rot:-.2,dy:-8,dx:-14}],[.3,{rot:-.3,dy:-64,dx:0}],[.5,{rot:.28,dy:-24,dx:0}],[.62,{sy:.88,sx:1.08}],[.8,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>.12&&A.t<.55)bc.x=Math.max(G.camX+60,Math.min(G.camX+VW-60,bc.x+A.f*420*dt)); if(cOnce(A,"h",.3)&&!A.z.dead){ const z=A.z, a=zc(z); z.carried=false; G.finKill=true; killZombie(z,TIER[z.tier].sc*2,"cat",A.f); G.finKill=false; for(const d of [-1,1]){ gibs(a.x,a.y,9,d); blood(a.x,a.y,22,d,2); boneFx(a.x,a.y,7,d); } decal(a.x,44); SFX.kill(); SFX.crack(); G.shake=Math.max(G.shake,17); G.hitStop=Math.max(G.hitStop,.08); cWord(A,bc,"THROUGH"); } if(cOnce(A,"land",.6)){ SFX.thunk(); G.shake=Math.max(G.shake,9); } }},
+ {n:"skydrop",dur:1.1,pose:t=>kf(t,[[0,{}],[.15,{dx:16,rot:.1}],[.25,{rot:-.2,dy:0,sy:.9}],[.55,{rot:-.3,dy:-150}],[.66,{rot:.3,dy:-120}],[.86,{rot:.16,dy:0,sy:.86,sx:1.1}],[1.1,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.62)cPin(A,1,m.x,m.y+8,.85); if(A.c&&cOnce(A,"spike",.62)){ for(const p of A.c.rag.pts){ p.vx=A.f*60; p.vy=1500; } SFX.whoosh(); }
+     if(cOnce(A,"land",.86)){ const b=A.c?A.c.rag.pts[1]:{x:m.px,y:GROUND}; blood(b.x,GROUND-10,26,0,1.8); gibs(b.x,GROUND-10,7,0); boneFx(b.x,GROUND-10,8,0); decal(b.x,44); for(let i=0;i<10;i++)part("m",b.x+(Math.random()-.5)*120,GROUND-4,(Math.random()-.5)*240,-40-Math.random()*60,.6,"#6a6c74",9+Math.random()*9); SFX.boom(); SFX.crack(); G.shake=Math.max(G.shake,20); G.hitStop=Math.max(G.hitStop,.07); cWord(A,bc,"SPIKED"); } }},
+ {n:"batplay",dur:1.15,pose:t=>({dx:8,rot:.16+Math.sin(t*17)*.1,dy:0}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.1)cGrab(A); [.2,.38,.56,.74].forEach((t,i)=>{ if(A.c&&cOnce(A,"b"+i,t)){ const b=A.c.rag.pts[1], d=i%2?-1:1; for(const p of A.c.rag.pts){ p.vx=A.f*d*300+(m.px+A.f*40-b.x)*2; p.vy=-300; } blood(b.x,b.y,6,d,1); G.slashes.push({x:b.x,y:b.y,life:.25,col:"#fff4d0"}); SFX.thunk(); G.shake=Math.max(G.shake,6); } });
+     if(A.c&&cOnce(A,"chomp",.92)){ const h=A.c.rag.pts[3]; A.c.rag.noHead=true; A.c.rag.bake=null; cBite(h,A.f,24); gibs(h.x,h.y,6,0); SFX.head(); G.hitStop=Math.max(G.hitStop,.06); cWord(A,bc,"PLAYTIME"); } }},
+ {n:"halve",dur:1.05,pose:t=>kf(t,[[0,{}],[.15,{dx:16,rot:.16}],[.55,{dx:16,rot:.16}],[.65,{dx:4,rot:-.42,dy:-18}],[.9,{rot:-.2}],[1.05,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.6){ cPin(A,3,m.x,m.y+4,.8); cPin(A,9,m.px+A.f*10,GROUND-2,.8); cPin(A,11,m.px+A.f*4,GROUND-2,.8); if(cOnce(A,"c",.3)){ SFX.crack(); G.shake=Math.max(G.shake,7); } }
+     if(A.c&&cOnce(A,"rip",.6)){ ragRip(A.c,"nLeg"); ragRip(A.c,"fLeg"); const b=A.c.rag.pts[0]; for(const i of [0,1,2,3,4,5,6,7]){ A.c.rag.pts[i].vx=A.f*120; A.c.rag.pts[i].vy=-620; } blood(b.x,b.y,40,0,2.2); gibs(b.x,b.y,12,0); boneFx(b.x,b.y,10,0); decal(b.x,50); SFX.crack(); SFX.kill(); SFX.flesh(); G.shake=Math.max(G.shake,17); G.hitStop=Math.max(G.hitStop,.1); cWord(A,bc,"HALVED"); } }},
+ {n:"rake",dur:1.1,pose:t=>({dx:20,rot:.2,dy:t>.2&&t<.9?-Math.abs(Math.sin(t*40))*7:0,sy:1}),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.9){ cPin(A,1,m.px+A.f*6,GROUND-4,.8); cPin(A,0,m.px-A.f*24,GROUND-4,.6); const k=Math.floor((A.t-.25)/.08); if(k>=0&&k!==A.st.k){ A.st.k=k; const b=A.c.rag.pts[0]; gibs(b.x,GROUND-10,2,-A.f); blood(b.x,GROUND-10,8,-A.f,1.6); if(k%2)SFX.flesh(); G.shake=Math.max(G.shake,5); if(k%3===0)decal(b.x-A.f*30,14+Math.random()*14); } }
+     if(A.c&&cOnce(A,"kick",.9)){ ragPush(A.c,-A.f*620,-260); boneFx(m.px,GROUND-10,8,-A.f); SFX.thunk(); cWord(A,bc,"GUTTED"); } }},
+ {n:"snap",dur:.6,pose:t=>kf(t,[[0,{}],[.1,{dx:18,rot:.1}],[.28,{dx:18,rot:.1}],[.32,{dx:-10,rot:-.3,dy:-8}],[.45,{rot:.1}],[.6,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.1)cGrab(A); if(A.c&&A.t<.45)cPin(A,2,m.x,m.y+6,.85); if(A.c&&cOnce(A,"s",.3)){ SFX.crack(); SFX.crack(); G.shake=Math.max(G.shake,10); G.hitStop=Math.max(G.hitStop,.06); blood(m.x,m.y,8,A.f,1); cWord(A,bc,"SNAP"); } }},
+ {n:"fetch",dur:.9,pose:t=>kf(t,[[0,{}],[.15,{dx:16,rot:.1}],[.3,{dx:-16,rot:-.2}],[.42,{dx:34,rot:.22}],[.9,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&A.t<.4)cPin(A,1,m.x,m.y+6,.85); if(A.c&&cOnce(A,"go",.4)){ let car=null, bd=1e9; for(const pl of G.platforms){ if(!pl.push)continue; const d=((pl.x+pl.w/2)-bc.x)*A.f; if(d>60&&d<520&&d<bd){ bd=d; car=pl; } } for(const p of A.c.rag.pts){ p.vx=A.f*1350; p.vy=-200; } SFX.whoosh(); if(car){ A.st.car=car; A.st.at=A.t+bd/1350; } cWord(A,bc,"FETCH"); }
+     if(A.st.car&&A.c&&A.t>=A.st.at&&!A.st.hit){ A.st.hit=1; const car=A.st.car, b=A.c.rag.pts[1]; vehHit(car,.22,A.f>0?car.x+8:car.x+car.w-8,car.y+car.h*.4,"slam"); for(const p of A.c.rag.pts){ p.vx*=-.25; p.vy=-180; } blood(b.x,b.y,20,-A.f,1.6); boneFx(b.x,b.y,8,-A.f); G.shake=Math.max(G.shake,14); G.hitStop=Math.max(G.hitStop,.06); } }},
+ {n:"catch",dur:1.3,pose:t=>kf(t,[[0,{}],[.15,{dx:14,rot:.1}],[.22,{rot:-.4,dy:-14}],[.7,{rot:-.36,dy:-8}],[.86,{rot:-.44,dy:-22}],[.98,{rot:.2,dy:0}],[1.3,{}]]),
+   run:(A,bc,dt,m)=>{ if(A.t>=.12)cGrab(A); if(A.c&&cOnce(A,"up",.2)){ for(const p of A.c.rag.pts){ p.vx=(m.x-A.c.rag.pts[1].x)*1.2; p.vy=-1000; } SFX.whoosh(); }
+     if(A.c&&A.t>.84&&A.t<1.1)cPin(A,0,m.x,m.y+4,.85); if(A.c&&cOnce(A,"chomp",.9)){ cBite(m,A.f,30); gibs(m.x,m.y,8,0); boneFx(m.x,m.y,8,0); ragRip(A.c,"nLeg"); G.hitStop=Math.max(G.hitStop,.08); G.shake=Math.max(G.shake,14); cWord(A,bc,"CAUGHT"); } if(A.c&&cOnce(A,"drop",1.1))ragPush(A.c,A.f*200,-120); }} ];
+let CATBAG=[];
+function catActStart(bc,z,ki){ const f=(z.x+z.w/2)>=bc.x?1:-1; bc.face=f; let near=0; for(const o of G.zombies){ if(o.dead||o.thrown||o.emT>0||o.fly)continue; const dx=((o.x+o.w/2)-bc.x)*f; if(dx>-20&&dx<150)near++; }
+  let K; if(ki!=null)K=CKILL[ki]; else if(z.boss||z.tier===3)K=CKILL[0]; else if(near>=3&&Math.random()<.7){ const M=CKILL.filter(k=>k.multi); K=M[Math.floor(Math.random()*M.length)]; }
+  else { if(!CATBAG.length){ CATBAG=CKILL.map((k,i)=>i).filter(i=>!CKILL[i].multi||CKILL[i].n==="roar"); for(let i=CATBAG.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [CATBAG[i],CATBAG[j]]=[CATBAG[j],CATBAG[i]]; } } K=CKILL[CATBAG.pop()]; }
+  if((z.boss||z.tier===3)&&!K.multi)K=CKILL[0];
+  bc.act={K,k:K.n,t:0,dur:K.dur,z,f,c:null,st:{}}; if(!K.multi){ z.carried=true; z.atkPh=0; z.kv=0; z.x+=((bc.x+f*96)-(z.x+z.w/2))*.6; } SFX.snarl(); if(K.multi)SFX.whoosh(); G.p.vicious+=K.dur*.45; }
+function catActEnd(bc){ const A=bc.act; if(A){ if(A.z&&A.z.carried&&!A.z.dead){ A.z.carried=false; A.z.spinA=0; A.z.y=GROUND-A.z.h; A.z.stagger=.5; } if(A.c&&A.c.rag){ A.c.rag.pins=[]; A.c.rag.hold=false; } } bc.act=null; bc.actCd=.12; }
+function catAct(bc,dt){ const A=bc.act; A.t+=dt; bc.spd=0; if(A.c&&A.c.rag)A.c.rag.pins=[]; if(A.z&&A.z.carried&&!A.z.dead&&!A.c){ A.z.y=GROUND-A.z.h; A.z.stagger=.3; }
+  A.K.run(A,bc,dt,catM(bc)); if(bc.act===A&&A.t>=A.dur)catActEnd(bc); }
+function catActPose(bc){ const A=bc.act, O={dx:0,dy:0,rot:0,sx:1,sy:1}; if(!A||!A.K.pose)return O; const o=A.K.pose(A.t,A.f,A)||{}, f=bc.face; O.dx=(o.dx||0)*f; O.dy=o.dy||0; O.rot=(o.rot||0)*f; O.sx=o.sx??1; O.sy=o.sy??1; return O; }
 // ---- a breath of cinema on the big kills: bars close in, the camera pushes, time drags
-function cine(dur,zoom){ if(G.dead||G.intro||(G.cineCd||0)>0)return; G.cine={t:0,dur,zoom:zoom||1.2}; G.cineCd=6; G.slow=Math.max(G.slow,dur*.55); }
-function drawCine(){ const C=G.cine; if(!C)return; const k=Math.min(1,C.t/.14,(C.dur-C.t)/.25), e=Math.max(0,k)*Math.max(0,k)*(3-2*Math.max(0,k)), bar=H*.085*e;
+function cine(dur,zoom){ return; if(G.dead||G.intro||(G.cineCd||0)>0)return; G.cine={t:0,dur,zoom:zoom||1.2}; G.cineCd=6; G.slow=Math.max(G.slow,dur*.55); }
+function drawCine(){ if(G.barsOut>0){ const b=H*.12*Math.min(1,G.barsOut/.6); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,b); ctx.fillRect(0,H-b,W,b); } const C=G.cine; if(!C)return; const k=Math.min(1,C.t/.14,(C.dur-C.t)/.25), e=Math.max(0,k)*Math.max(0,k)*(3-2*Math.max(0,k)), bar=H*.085*e;
   ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar);
   const vg=ctx.createRadialGradient(W/2,H*.6,H*.3,W/2,H*.6,H*.95); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,`rgba(0,0,0,${.5*e})`); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H); }
+// ---- ragdolls: a dead body is 12 points on its own rig, held together by bones, thrown by whatever killed it, and settling on the street.
+// points: 0 hip, 1 shoulder, 2 neck, 3 head, 4/5 near elbow/hand, 6/7 far elbow/hand, 8/9 near knee/foot, 10/11 far knee/foot. Limbs can be torn off and held.
+const RAGPOW={melee:[300,-170],crit:[150,-70],shot:[170,-60],gib:[240,-120],cat:[520,-300],boom:[620,-430],stomp:[60,0],pop:[260,-200]};
+// the 12 joint positions of any rigged character in its current pose, in world space
+function rigPts(z,nm,q){ const R=HR.rigs[nm], K=HR.K, D=Math.PI/180; q=q||{};
+  const f=z.h/HR.CH, face=z.face<0?-1:1, by=z.y+z.h+(z.dz||0), X=cx=>z.x+z.w/2+face*(cx-HR.CW/2)*f, Y=cy=>by-(HR.CH-cy)*f;
+  const nTH=q.nTH||0,nSH=q.nSH||0,fTH=q.fTH||0,fSH=q.fSH||0,TT=q.T||0;
+  const reach=(TH,SH)=>Math.cos(TH*D)*R.th.len+Math.cos((TH+SH)*D)*R.sh.len, drop=Math.max(reach(nTH,nSH),reach(fTH,fSH));
+  const hx=HR.CW/2+(q.hipX||0)*K, hy=HR.GY-drop*K-(q.lift||0)*K, T=TT*D, TL=R.torso.len*K, sT=Math.sin(T), cT=Math.cos(T);
+  const c=[]; const add=(cx,cy)=>{ c.push({x:X(cx),y:Y(cy),vx:0,vy:0,ox:0,oy:0}); return [cx,cy]; };
+  const hip=add(hx,hy), sh=add(hx+sT*TL*R.sho,hy-cT*TL*R.sho), nk=add(hx+sT*TL*R.neck,hy-cT*TL*R.neck);
+  const hr=(TT*.55+(q.H||0))*D, hl=R.head.dh*K*.5; add(nk[0]+Math.sin(hr)*hl,nk[1]-Math.cos(hr)*hl);
+  const limb=(o,A,B,L1,L2)=>{ const e=add(o[0]+Math.sin(A)*L1*K,o[1]+Math.cos(A)*L1*K); add(e[0]+Math.sin(B)*L2*K,e[1]+Math.cos(B)*L2*K); };
+  limb(sh,((q.nUA||0)+TT)*D,((q.nUA||0)+TT+(q.nFA||0))*D,R.ua.len,R.fa.len); limb(sh,((q.fUA||0)+TT)*D,((q.fUA||0)+TT+(q.fFA||0))*D,R.ua.len,R.fa.len);
+  limb(hip,nTH*D,(nTH+nSH)*D,R.th.len,R.sh.len); limb(hip,fTH*D,(fTH+fSH)*D,R.th.len,R.sh.len);
+  return {pts:c,R,f,face}; }
+function makeRag(z,dir,how,nm){ nm=nm||("z"+z.tier); if((z.boss&&nm!=="op"&&nm!=="boss")||!hrReady(nm))return null; const q=z._q||(nm==="op"?{}:zParams(z)), J=rigPts(z,nm,q), c=J.pts, R=J.R, f=J.f, face=J.face;
+  const d=(i,j)=>Math.hypot(c[i].x-c[j].x,c[i].y-c[j].y), cons=[];
+  for(const [i,j] of [[0,1],[1,2],[0,2],[2,3],[1,3],[1,4],[4,5],[1,6],[6,7],[0,8],[8,9],[0,10],[10,11]])cons.push([i,j,d(i,j),0]);
+  const legL=(R.th.len+R.sh.len)*HR.K*f, armL=(R.ua.len+R.fa.len)*HR.K*f;
+  cons.push([0,9,legL*.42,1],[0,11,legL*.42,1],[1,5,armL*.3,1],[1,7,armL*.3,1],[3,0,d(3,0)*.55,1],[9,11,legL*.12,1]);      // knees and elbows can only fold so far; the head cannot fold into the chest
+  const P=G.killPow||{}, base=RAGPOW[how]||[160,-50], vx=P.vx!=null?P.vx:dir*base[0]*(.8+Math.random()*.4), vy=P.vy!=null?P.vy:base[1]*(.8+Math.random()*.4), spin=(P.spin!=null?P.spin:(1.6+Math.random()*1.8))*Math.sign(vx||dir), h0=c[0].y;
+  const at=P.at!=null?c[P.at]:null, ax=at?at.x:0, ay=at?at.y:0; c.forEach((p,i)=>{ const up=at?(.3+.7/(1+Math.hypot(p.x-ax,p.y-ay)/(z.h*.3))):(i<8?1:.32); p.vx=vx*up+(i===3&&!at?vx*.2:0)-(p.y-h0)*spin; p.vy=vy*(at?up:(i<8?1:.4)); });
+  const bones=[{id:"fUA",img:R.far.ua,def:R.ua,a:1,b:6},{img:R.far.fa,def:R.fa,a:6,b:7},{id:"fTH",img:R.far.th,def:R.th,a:0,b:10},{img:R.far.sh,def:R.sh,a:10,b:11},
+    {id:"nTH",img:R.img.th,def:R.th,a:0,b:8},{img:R.img.sh,def:R.sh,a:8,b:9}];
+  if(R.tail)bones.push({coat:true,img:R.img.tail,def:R.tail,a:0});
+  bones.push({img:R.img.torso,def:R.torso,a:0,b:2},{id:"HEAD",head:true,a:2,b:3},{id:"nUA",img:R.img.ua,def:R.ua,a:1,b:4},{img:R.img.fa,def:R.fa,a:4,b:5});
+  return {rig:R,f,face,pts:c,cons,bones,pins:[],cut:[],still:0,asleep:false,bake:null,noHead:!!(P.noHead||how==="crit"),tier:z.tier,gy:GROUND+4+(z.dz||0)*.6}; }
+const RIPS={nArm:{bone:"nUA",from:1,to:4,rm:[[1,4],[1,5]],grab:5},fArm:{bone:"fUA",from:1,to:6,rm:[[1,6],[1,7]],grab:7},
+  nLeg:{bone:"nTH",from:0,to:8,rm:[[0,8],[0,9],[9,11]],grab:9},fLeg:{bone:"fTH",from:0,to:10,rm:[[0,10],[0,11],[9,11]],grab:11},head:{bone:"HEAD",from:2,to:3,rm:[[2,3],[1,3],[3,0]],grab:3}};
+function ragRip(c,part){ const R=c.rag, s=RIPS[part]; if(!R)return null; R.ripped=R.ripped||{}; if(R.ripped[part])return null; R.ripped[part]=1;
+  const P=R.pts, o=P[s.from]; P.push({x:o.x,y:o.y,vx:o.vx,vy:o.vy,ox:o.x,oy:o.y}); const ni=P.length-1;
+  R.cons=R.cons.filter(([i,j])=>!s.rm.some(([a,b])=>(i===a&&j===b)||(i===b&&j===a))); R.cons.push([ni,s.to,Math.hypot(P[s.to].x-o.x,P[s.to].y-o.y),0]);
+  for(const b of R.bones)if(b.id===s.bone)b.a=ni; R.cut.push({i:s.from,j:ni,t:0}); if(R.w)R.w.push(1); R.asleep=false; R.bake=null; return s.grab; }
+function ragPush(c,vx,vy){ const R=c.rag; if(!R)return; R.asleep=false; R.bake=null; R.still=0; for(const p of R.pts){ p.vx+=vx*(.7+Math.random()*.6); p.vy+=vy*(.7+Math.random()*.6); } }
+function ragStep(c,dt){ const R=c.rag, P=R.pts, pl=G.p, px=pl.x+pl.w/2;
+  if(!G.dead&&Math.abs(pl.vx)>90&&pl.onGround&&Math.abs(P[0].x-px)<34&&!G.fin){ for(const p of P)if(Math.abs(p.x-px)<26&&p.y>pl.y+pl.h*.55){ if(R.asleep){ R.asleep=false; R.bake=null; } p.vx+=pl.vx*.55; p.vy-=40; } }      // he shoves the dead out of his way
+  if(R.pins.length||R.hold){ R.asleep=false; R.bake=null; }
+  if(R.asleep||dt<=0)return;
+  for(const p of P){ p.ox=p.x; p.oy=p.y; p.vx*=.996; p.vy+=1650*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; }
+  for(let it=0;it<8;it++){
+    const Wt=R.w; for(const [i,j,L,t] of R.cons){ const a=P[i], b=P[j], dx=b.x-a.x, dy=b.y-a.y, dd=Math.hypot(dx,dy)||.001; if(t===1&&dd>=L)continue; const wa=Wt?Wt[i]:1, wb=Wt?Wt[j]:1, k=(dd-L)/dd/(wa+wb); a.x+=dx*k*wa; a.y+=dy*k*wa; b.x-=dx*k*wb; b.y-=dy*k*wb; }
+    for(const pn of R.pins){ const p=P[pn.i]; p.x+=(pn.x-p.x)*pn.k; p.y+=(pn.y-p.y)*pn.k; }
+    for(const p of P){ if(p.y>R.gy){ p.y=R.gy; p.x=p.ox+(p.x-p.ox)*.62; } } }
+  let mv=0; for(const p of P){ p.vx=(p.x-p.ox)/dt; p.vy=(p.y-p.oy)/dt; if(Math.abs(p.vx)>2600)p.vx*=.5; if(Math.abs(p.vy)>2600)p.vy*=.5; mv=Math.max(mv,Math.abs(p.vx),Math.abs(p.vy)); }
+  c.x=P[0].x;
+  if(R.char&&c.t<5&&Math.random()<dt*14){ const q=P[Math.floor(Math.random()*12)]; part("f",q.x,q.y,(Math.random()-.5)*20,-50-Math.random()*50,.3,null,2.5+Math.random()*2.5); if(Math.random()<.3)part("a",q.x,q.y,(Math.random()-.5)*30,-60,.8,"#ffb060",1.5); }
+  if(mv>380&&Math.random()<dt*30)part("g",P[1].x,P[1].y,(Math.random()-.5)*60,Math.random()*40,.5,"#8f0d11",1.6+Math.random()*1.8);
+  if(R.noHead&&c.t<1.5&&Math.random()<dt*46){ const ux=P[2].x-P[1].x, uy=P[2].y-P[1].y, ul=Math.hypot(ux,uy)||1, s=180+Math.random()*220*(1.5-c.t); part("g",P[2].x,P[2].y,ux/ul*s+(Math.random()-.5)*60,uy/ul*s-60,.55,"#a01014",1.8+Math.random()*2); }      // the neck keeps pumping
+  for(const ct of R.cut){ ct.t+=dt; if(ct.t<1.8&&Math.random()<dt*(22-ct.t*10)){ for(const [ia,ib] of [[ct.i,ct.j],[ct.j,ct.i]]){ const a=P[ia], b=P[ib], ux=a.x-b.x, uy=a.y-b.y, ul=Math.hypot(ux,uy)||1, s=120+Math.random()*260; part("g",a.x,a.y,ux/ul*s*.4+(Math.random()-.5)*120,-80-Math.random()*200,.6,"#a01014",1.1+Math.random()*1.3); } } }
+  if(mv<12&&!R.pins.length&&!R.hold){ R.still+=dt; if(R.still>.5){ R.asleep=true; ragBake(c); } } else R.still=0; }
+function ragPiece(x,c,img,def,a,b){ const R=c.rag, th=Math.atan2(b.x-a.x,b.y-a.y), K=HR.K; x.save(); x.translate(a.x,a.y); x.scale(R.face*R.f,R.f); x.rotate(def.a0-(R.face<0?-th:th)); x.drawImage(img,-def.px*def.dw*K,-def.py*def.dh*K,def.dw*K,def.dh*K); x.restore(); }
+function ragDraw(x,c){ const R=c.rag, G2=R.rig, P=R.pts, K=HR.K; if(R.char){ x.save(); x.filter="brightness(.16) contrast(1.2)"; R.char=2; ragDraw0(x,c); x.restore(); R.char=true; return; } ragDraw0(x,c); }
+function ragDraw0(x,c){ const R=c.rag, G2=R.rig, P=R.pts, K=HR.K;
+  for(const b of R.bones){
+    if(b.head){ if(R.noHead)continue; const hp=G2.head, a=P[b.a], h=P[b.b], rl=Math.atan2(R.face*(h.x-a.x),-(h.y-a.y)); x.save(); x.translate(a.x,a.y); x.scale(R.face*R.f,R.f); x.rotate(rl); x.drawImage(G2.img.head,-hp.px*hp.dw*K,-hp.py*hp.dh*K,hp.dw*K,hp.dh*K); if(R.faceOff){ x.fillStyle="#8c0b0f"; x.beginPath(); x.ellipse(hp.dw*K*.16,-hp.dh*K*.42,hp.dw*K*.3,hp.dh*K*.34,0,0,6.28); x.fill(); x.fillStyle="#e8dcc4"; x.fillRect(hp.dw*K*.1,-hp.dh*K*.3,hp.dw*K*.22,1.6); } x.restore(); continue; }
+    if(b.coat){ const a=P[b.a], n=P[2], dx=a.x-n.x, dy=a.y-n.y, dl=Math.hypot(dx,dy)||1, L=b.def.len*K*R.f; ragPiece(x,c,b.img,b.def,a,{x:a.x+dx/dl*L*.55+(P[8].x+P[10].x-2*a.x)*.18,y:a.y+dy/dl*L}); continue; }
+    ragPiece(x,c,b.img,b.def,P[b.a],P[b.b]); }
+  if(R.noHead){ x.fillStyle="#7a0a0d"; x.beginPath(); x.arc(P[2].x,P[2].y,3.2*R.f*K,0,6.28); x.fill(); }
+  for(const ct of R.cut){ x.fillStyle="#8c0b0f"; for(const i of [ct.i,ct.j]){ x.beginPath(); x.arc(P[i].x,P[i].y,3*R.f*K,0,6.28); x.fill(); } x.fillStyle="#e8dcc4"; x.beginPath(); x.arc(P[ct.j].x,P[ct.j].y,1.1*R.f*K,0,6.28); x.fill(); } }      // raw ends, and the bone showing
+function ragBake(c){ const R=c.rag, P=R.pts, m=c.h*.45, S=1.6; let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9; for(const p of P){ x0=Math.min(x0,p.x); y0=Math.min(y0,p.y); x1=Math.max(x1,p.x); y1=Math.max(y1,p.y); }
+  x0-=m; y0-=m; x1+=m; y1+=m*.4; const cv=document.createElement("canvas"); cv.width=Math.ceil((x1-x0)*S); cv.height=Math.ceil((y1-y0)*S); const x=cv.getContext("2d"); x.scale(S,S); x.translate(-x0,-y0); ragDraw(x,c); R.bake={cv,x:x0,y:y0,w:x1-x0,h:y1-y0}; }
+function drawRagCorpse(c){ const R=c.rag, P=R.pts, fade=c.hero?1:(c.t>16?Math.max(0,1-(c.t-16)/3):1), pool=Math.max(0,Math.min(1,(c.t-.6)/3));
+  if(pool>0&&(R.asleep||c.hero)){ const mx=(P[0].x+P[2].x)/2; ctx.fillStyle=`rgba(70,6,8,${.55*fade})`; ctx.beginPath(); ctx.ellipse(mx,R.gy+3,c.h*(c.hero?.6:.4)*pool,5.5*pool,0,0,6.28); ctx.fill(); }
+  ctx.save(); ctx.globalAlpha=(c.hero?1:.9)*fade; if(R.bake)ctx.drawImage(R.bake.cv,R.bake.x,R.bake.y,R.bake.w,R.bake.h); else ragDraw(ctx,c); ctx.restore(); }
+// ---- the finisher: every so many kills the game takes over for a beat and he kills one of them by hand.
+// A finisher = one OPENER (how he gets hold of it) + one KILL (how it dies) + one CAMERA move. 6 x 18 x 3: no two in a row alike.
+const FIN_T=1.25, NG={gun:null,gx2:null}, STN={nTH:22,nSH:-16,fTH:-20,fSH:-6};
+function heroPts(){ const p=G.p; if(!hrReady("op")){ const o=[]; for(let i=0;i<12;i++)o.push({x:p.x+p.w/2+(p.face||1)*(i===9||i===11?20:16),y:p.y+p.h*(i===3?.1:i>=8?.8:.4)}); return o; } return rigPts({x:p.x,y:p.y,w:p.w,h:p.h,face:p.face,dz:0},"op",p._q||{}).pts; }      // 3 head, 5 near hand, 7 far hand, 9 near foot, 11 far foot
+function ragKill(z,dir,opt){ opt=opt||{}; G.finKill=true; G.killPow=Object.assign({vx:0,vy:0,spin:0},opt); killZombie(z,TIER[z.tier].sc*(opt.mult||3),"melee",dir); G.killPow=null; G.finKill=false; const c=G.corpses[G.corpses.length-1]; return c&&c.rag&&!c.hero?c:null; }
+function zHead(z){ const R=HR.rigs[z.boss?"boss":"z"+z.tier], im=R&&R.img&&R.img.head; return (im&&im.width)?im:null; }
+function headToss(z,x,y,vx,vy,vr){ toss({k:"head",im:zHead(z),L:z.h*.21,x,y,vx,vy,rot:0,vr:vr||14,life:8,gz:5}); }
+function gunFlash(x,y,big){ G.lights.push({x,y,r:G.fin?(big?80:56):(big?210:150),life:.07,max:.07,col:"255,226,160"}); for(let i=0;i<(big?9:5);i++)part("s",x,y,(Math.random()-.5)*420,(Math.random()-.5)*420,.1+Math.random()*.1,"#ffd98a",1.4); SFX[G.weapon==="shotgun"?"shotgun":"pistol"](); const p=G.p; toss({k:"brass",c:"#cfa64c",L:3.4,x:p.x+p.w/2,y:y,vx:-p.face*90,vy:-220,rot:0,vr:20,life:16,gz:8}); G.shake=Math.max(G.shake,7); }
+function zc(z){ return {x:z.x+z.w/2,y:z.y+z.h*.42,hy:z.y+z.h*.1}; }
+const FOPEN=[
+  {n:"walk",fr:[]},
+  {n:"parry",vz:[[0,"lunge"],[.2,"grab"]],fr:[[0,{T:-16,hipX:-7,H:-8}],[.2,{T:4}]]},
+  {n:"collar",vz:[[0,"grab"]],fr:[[0,{...NG,nUA:88,nFA:0,T:12}],[.2,{...NG,nUA:70,nFA:30,T:2}]],pre:[[.1,(F,z,f)=>{ z.x-=f*8; SFX.whoosh(); }]]},
+  {n:"butt",vz:[[.1,"back"]],fr:[[0,{gx:6,gy:5,gA:-26,T:-4}],[.08,{gx:37,gy:-1,gA:-6,T:16,snap:1}],[.2,{T:4}]],pre:[[.1,(F,z,f)=>{ const a=zc(z); burstFx(a.x,a.hy,"#fff4d0",5); blood(a.x,a.hy,5,f,.9); SFX.melee(); G.shake=Math.max(G.shake,6); }]]},
+  {n:"boot",vz:[[.1,"gut"]],fr:[[0,{nTH:60,nSH:-100,T:-4}],[.08,{nTH:78,nSH:-8,T:-10,snap:1}],[.2,{T:2}]],pre:[[.1,(F,z,f)=>{ const a=zc(z); burstFx(a.x,a.y,"#fff4d0",5); SFX.melee(); SFX.thunk(); G.shake=Math.max(G.shake,6); }]]},
+  {n:"hipfire",vz:[[.1,"back"]],fr:[[0,{gx:20,gy:14,gA:6,gx2:18,gy2:12,gA2:4,T:-4}],[.2,{T:2}]],pre:[[.1,(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*26,a.y); blood(a.x,a.y,10,f,1.2); }]]} ];
+const CHAMB={nTH:72,nSH:-114,T:-6,fTH:-4,fSH:-6};
+const FKILL=[
+  {n:"kickoff",d:50,fr:[[.30,CHAMB],[.48,{nTH:132,nSH:-4,T:-26,fTH:-8,fSH:-6,H:-8,snap:1}],[.66,{nTH:64,nSH:-70,T:-10}],[.98,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); headToss(z,a.x,a.hy,f*(420+Math.random()*120),-780,f*18); blood(a.x,a.hy,22,f,1.8); boneFx(a.x,a.hy,6,f); SFX.head(); return ragKill(z,f,{vx:f*230,vy:-120,noHead:true,spin:2.4}); }},
+  {n:"headrip",d:26,ht:.56,vz:[[.3,"grab"]],fr:[[.30,{...NG,...STN,nUA:78,nFA:6,fUA:66,fFA:20,T:18}],[.46,{...NG,...STN,nUA:88,nFA:-8,fUA:70,fFA:14,T:14}],[.56,{...NG,...STN,nUA:170,nFA:-26,fUA:30,fFA:40,T:-14,H:-10,snap:1}],[.68,{...NG,...STN,nUA:158,nFA:-14,fUA:24,fFA:46,T:-8,H:-18}],[.9,{...NG,nUA:40,nFA:10,T:12,snap:1}],[1.0,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); F.held={im:zHead(z),L:z.h*.21,until:.9,vx:-f*260,vy:-380}; blood(a.x,a.hy,26,0,1.9); gibs(a.x,a.hy,5,-f); boneFx(a.x,a.hy,6,-f); SFX.head(); return ragKill(z,f,{vx:f*40,vy:-30,noHead:true,spin:.6}); }},
+  {n:"kickthrough",d:44,fr:[[.30,{...CHAMB,T:8}],[.48,{nTH:94,nSH:-2,T:-12,fTH:-14,fSH:-4,hipX:5,snap:1}],[.66,{nTH:80,nSH:-26,T:-6}],[.98,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x+f*14,a.y,30,f,2.3); gibs(a.x+f*14,a.y,10,f); boneFx(a.x+f*10,a.y,9,f); for(let i=0;i<20;i++)part("g",a.x+f*10,a.y+(Math.random()-.5)*20,f*(400+Math.random()*700),(Math.random()-.6)*300,.7,"#9a0f12",2+Math.random()*3); SFX.thunk(); return ragKill(z,f,{vx:f*980,vy:-280,spin:3.2,at:0}); }},
+  {n:"chinshot",d:30,vz:[[.3,"grab"]],fr:[[.30,{gx:19,gy:-1,gA:-72,gx2:17,gy2:-3,gA2:-76,T:8}],[.5,{gx:17,gy:3,gA:-84,gx2:15,gy2:1,gA2:-88,T:2,snap:1}],[.8,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*4,a.hy+10,true); headToss(z,a.x,a.hy,f*40,-940,f*9); blood(a.x,a.hy,26,0,2); gibs(a.x,a.hy,6,0); SFX.head(); return ragKill(z,f,{vx:f*50,vy:-250,noHead:true,spin:.9,at:2}); }},
+  {n:"gutblast",d:34,fr:[[.30,{gx:27,gy:11,gA:6,gx2:25,gy2:13,gA2:8,T:12}],[.5,{gx:21,gy:9,gA:-8,gx2:19,gy2:11,gA2:-6,T:-8,snap:1}],[.8,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*18,a.y,true); blood(a.x+f*10,a.y,28,f,2.2); gibs(a.x+f*10,a.y,8,f); boneFx(a.x+f*8,a.y,5,f); return ragKill(z,f,{vx:f*780,vy:-90,spin:-2.6,at:0}); }},
+  {n:"necksnap",d:27,ht:.47,vz:[[.3,"grab"]],fr:[[.30,{...NG,...STN,nUA:84,nFA:4,fUA:74,fFA:14,T:14}],[.47,{...NG,...STN,nUA:98,nFA:-34,fUA:58,fFA:54,T:8,H:8,snap:1}],[.62,{...NG,nUA:30,nFA:20,fUA:10,fFA:30,T:2}],[.9,{}]],
+    hit:(F,z,f)=>{ SFX.crack(); SFX.crack(); G.shake=Math.max(G.shake,8); return ragKill(z,f,{vx:0,vy:30,spin:.5}); }},
+  {n:"uppercut",d:31,ht:.46,fr:[[.30,{...NG,nUA:-30,nFA:112,T:18,nTH:30,nSH:-36,fTH:-20,fSH:-10}],[.46,{...NG,...STN,nUA:152,nFA:8,T:-18,lift:4,snap:1}],[.7,{...NG,nUA:120,nFA:20,T:-8}],[.9,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); headToss(z,a.x,a.hy,f*150,-860,f*20); blood(a.x,a.hy,20,0,1.8); boneFx(a.x,a.hy,7,f); SFX.head(); SFX.melee(); return ragKill(z,f,{vx:f*150,vy:-470,noHead:true,spin:1.4,at:2}); }},
+  {n:"chokeslam",d:30,ht:.64,vz:[[.3,"lift"]],lift:[[.34,0],[.5,46],[.62,50]],fr:[[.30,{...NG,...STN,nUA:92,nFA:0,fUA:80,fFA:10,T:12}],[.44,{...NG,...STN,nUA:166,nFA:-8,fUA:158,fFA:-6,T:-12}],[.64,{...NG,nUA:38,nFA:10,fUA:28,fFA:14,T:36,nTH:38,nSH:-44,fTH:-24,fSH:-8,snap:1}],[.95,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); G.shake=Math.max(G.shake,18); SFX.thunk(); SFX.crack(); for(let i=0;i<8;i++)part("m",a.x+f*20+(Math.random()-.5)*50,GROUND-4,(Math.random()-.5)*160,-30-Math.random()*50,.5,"#6a6c74",8+Math.random()*8); decal(a.x+f*20,40); return ragKill(z,f,{vx:f*60,vy:980,spin:-1.2}); }},
+  {n:"stomp",d:40,ht:.62,vz:[[.38,"kneel"]],fr:[[.30,{nTH:62,nSH:-8,T:-6,snap:1}],[.44,{nTH:100,nSH:-104,T:4}],[.62,{nTH:44,nSH:-6,T:18,snap:1}],[.9,{}]],pre:[[.34,(F,z,f)=>{ SFX.crack(); const a=zc(z); boneFx(a.x,z.y+z.h*.75,4,f); G.shake=Math.max(G.shake,6); }]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.hy+20,26,0,2); gibs(a.x,a.hy+20,10,0); boneFx(a.x,a.hy+20,8,0); SFX.head(); SFX.thunk(); G.shake=Math.max(G.shake,15); return ragKill(z,f,{vx:f*20,vy:520,noHead:true,spin:.4}); }},
+  {n:"heartrip",d:27,ht:.62,vz:[[.3,"grab"],[.46,"back"]],fr:[[.30,{...NG,...STN,nUA:40,nFA:64,T:-10}],[.46,{...NG,...STN,nUA:92,nFA:-4,T:22,snap:1}],[.62,{...NG,...STN,nUA:58,nFA:74,T:-8,snap:1}],[.98,{...NG,nUA:30,nFA:20}],[1.05,{}]],pre:[[.46,(F,z,f)=>{ const a=zc(z); blood(a.x+f*12,a.y-8,24,f,2); gibs(a.x+f*12,a.y-8,5,f); SFX.flesh(); SFX.crack(); G.shake=Math.max(G.shake,10); G.hitStop=Math.max(G.hitStop,.05); }]],
+    hit:(F,z,f)=>{ const a=zc(z); F.held={heart:1,until:.98,vx:f*120,vy:-200}; blood(a.x,a.y-8,16,-f,1.4); SFX.flesh(); return ragKill(z,f,{vx:f*10,vy:10,spin:.3}); }},
+  {n:"roundhouse",d:46,fr:[[.30,{T:-8,nTH:34,nSH:-86,fTH:-6,fSH:-12}],[.48,{T:-28,H:6,nTH:106,nSH:6,fTH:-12,fSH:-4,lift:2,snap:1}],[.68,{T:-10,nTH:52,nSH:-66}],[.95,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); boneFx(a.x,a.hy,8,f); blood(a.x,a.hy,14,f,1.5); SFX.melee(); SFX.crack(); return ragKill(z,f,{vx:f*540,vy:-230,spin:7,at:3}); }},
+  {n:"juggle",d:42,ht:.44,dur:1.5,fr:[[.30,CHAMB],[.44,{nTH:120,nSH:-6,T:-30,fTH:-8,fSH:-6,snap:1}],[.56,{gx:20,gy:-19,gA:-54,gx2:18,gy2:-21,gA2:-58,T:-8}],[1.1,{}]],
+    hit:(F,z,f)=>{ SFX.melee(); SFX.thunk(); F.shots=[.62,.74,.86,.98]; return ragKill(z,f,{vx:f*26,vy:-800,spin:3}); },
+    post:(F,dt,f)=>{ if(F.c&&F.shots.length&&F.t>=F.shots[0]){ F.shots.shift(); const b=F.c.rag.pts[1], h=heroPts()[5]; gunFlash(h.x+f*8,h.y-6); ragPush(F.c,f*90,-300); blood(b.x,b.y,12,f,1.4); if(!F.shots.length){ gibs(b.x,b.y,8,f); boneFx(b.x,b.y,6,f); } } }},
+  {n:"armclub",d:30,ht:.44,dur:1.4,vz:[[.3,"grab"]],fr:[[.30,{...NG,...STN,nUA:80,nFA:10,T:10}],[.44,{...NG,...STN,nUA:172,nFA:-20,T:-14,snap:1}],[.62,{...NG,...STN,nUA:56,nFA:20,T:26,snap:1}],[.74,{...NG,...STN,nUA:172,nFA:-20,T:-14,snap:1}],[.9,{...NG,...STN,nUA:56,nFA:20,T:26,snap:1}],[1.1,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.y-10,18,-f,1.6); boneFx(a.x,a.y-10,6,-f); SFX.crack(); SFX.flesh(); const c=ragKill(z,f,{vx:f*30,vy:0,spin:.4}); if(c){ const gi=ragRip(c,"nArm"); if(gi!=null)F.pin={i:gi,until:1.05}; } F.clubs=[.62,.9]; return c; },
+    post:(F,dt,f)=>{ if(F.c&&F.clubs.length&&F.t>=F.clubs[0]){ F.clubs.shift(); const b=F.c.rag.pts[1]; ragPush(F.c,f*300,240); blood(b.x,b.y,14,f,1.4); SFX.melee(); SFX.crack(); G.shake=Math.max(G.shake,10); G.hitStop=Math.max(G.hitStop,.04); } }},
+  {n:"crossfire",d:28,vz:[[.3,"grab"]],fr:[[.30,{gx:22,gy:-7,gA:-12,gx2:31,gy2:-13,gA2:-4,T:8}],[.5,{gx:18,gy:-7,gA:-22,gx2:27,gy2:-13,gA2:-14,T:2,snap:1}],[.8,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*8,a.hy,true); gunFlash(a.x+f*8,a.hy); blood(a.x,a.hy,34,0,2.2); gibs(a.x,a.hy,12,0); boneFx(a.x,a.hy,8,0); SFX.head(); return ragKill(z,f,{vx:0,vy:-70,noHead:true,spin:.4}); }},
+  {n:"kneecap",d:40,ht:.64,vz:[[.38,"kneel"]],fr:[[.30,{gx:22,gy:17,gA:52,gx2:20,gy2:15,gA2:50,T:8}],[.46,{gx:27,gy:6,gA:22,gx2:25,gy2:4,gA2:20,T:14}],[.64,{gx:23,gy:6,gA:10,gx2:21,gy2:4,gA2:8,T:6,snap:1}],[.9,{}]],pre:[[.36,(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*20,z.y+z.h*.7); blood(a.x,z.y+z.h*.75,10,f,1.2); boneFx(a.x,z.y+z.h*.75,4,f); }]],
+    hit:(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*10,a.hy+24,true); blood(a.x+f*6,a.hy+24,26,f,2); gibs(a.x+f*6,a.hy+24,8,f); SFX.head(); return ragKill(z,f,{vx:f*230,vy:-30,noHead:true,spin:-2.4,at:2}); }},
+  {n:"whip3",d:33,ht:.66,vz:[[.38,"back"],[.52,"gut"]],fr:[[.30,{gx:5,gy:6,gA:-28,T:-4}],[.37,{gx:37,gy:0,gA:-6,T:16,snap:1}],[.45,{gx2:3,gy2:6,gA2:-24,T:-2}],[.51,{gx2:39,gy2:-1,gA2:-4,T:22,snap:1}],[.6,{gx:28,gy:2,gA:16,gx2:26,gy2:0,gA2:14,T:8}],[.66,{gx:24,gy:2,gA:6,T:2,snap:1}],[.9,{}]],
+    pre:[[.38,(F,z,f)=>{ const a=zc(z); burstFx(a.x,a.hy,"#fff4d0",5); blood(a.x,a.hy,6,f,1); SFX.melee(); G.shake=Math.max(G.shake,6); }],[.52,(F,z,f)=>{ const a=zc(z); burstFx(a.x,a.y,"#fff4d0",5); blood(a.x,a.hy,6,f,1); SFX.melee(); boneFx(a.x,a.hy,3,f); G.shake=Math.max(G.shake,7); }]],
+    hit:(F,z,f)=>{ const a=zc(z); gunFlash(a.x-f*14,a.hy+18,true); blood(a.x+f*6,a.hy+18,24,f,2); gibs(a.x,a.hy+18,7,f); SFX.head(); return ragKill(z,f,{vx:f*270,vy:-80,noHead:true,spin:-3,at:2}); }},
+  {n:"kneeelbow",d:29,ht:.62,vz:[[.38,"gut"]],fr:[[.30,{...NG,nTH:84,nSH:-112,T:12,nUA:70,nFA:10,fUA:60,fFA:14,snap:1}],[.48,{...NG,...STN,nUA:150,nFA:-96,T:-8}],[.62,{...NG,...STN,nUA:44,nFA:-104,T:32,snap:1}],[.9,{}]],pre:[[.36,(F,z,f)=>{ const a=zc(z); burstFx(a.x,a.y,"#fff4d0",5); SFX.melee(); SFX.thunk(); G.shake=Math.max(G.shake,8); G.hitStop=Math.max(G.hitStop,.04); }]],
+    hit:(F,z,f)=>{ const a=zc(z); boneFx(a.x,a.y-10,8,0); blood(a.x,a.y-10,10,0,1.3); SFX.crack(); SFX.crack(); G.shake=Math.max(G.shake,13); return ragKill(z,f,{vx:f*20,vy:660,spin:.3,at:1}); }},
+  {n:"sweepstomp",d:38,ht:.38,dur:1.35,fr:[[.30,{nTH:54,nSH:-4,T:-14,fTH:-10,fSH:-30,snap:1}],[.46,{nTH:44,nSH:-84,fTH:34,fSH:-74,T:22}],[.56,{lift:24,nTH:64,nSH:-104,fTH:54,fSH:-94,T:2,snap:1}],[.72,{lift:0,nTH:24,nSH:-12,fTH:-10,fSH:-8,T:12,snap:1}],[1.0,{}]],
+    hit:(F,z,f)=>{ SFX.melee(); F.stomp=.72; return ragKill(z,f,{vx:-f*40,vy:-150,spin:-5,at:9}); },
+    post:(F,dt,f)=>{ if(F.c&&F.stomp&&F.t>=F.stomp){ F.stomp=0; const R=F.c.rag, h=R.pts[2]; R.noHead=true; R.bake=null; R.asleep=false; ragPush(F.c,0,420); blood(h.x,h.y,28,0,2.1); gibs(h.x,h.y,11,0); boneFx(h.x,h.y,8,0); decal(h.x,34); SFX.head(); SFX.thunk(); G.shake=Math.max(G.shake,16); G.hitStop=Math.max(G.hitStop,.07); } }} ];
+let FINBAG=[], FINSEEN=0;
+function onStreet(){ const p=G.p; return p.onGround&&Math.abs(p.y+p.h-GROUND)<5; }
+function spotClear(x){ return !G.platforms.some(q=>q.type!=="ground"&&x>q.x-12&&x<q.x+q.w+12); }
+function finTry(){ const p=G.p; if(G.stealth||G.fin||(G.finCd||0)>0||(G.finK||0)<(G.finNeed||16))return;
+  if(!onStreet()||G.swap||p.atkT>0||G.intro||G.dead||G.won||G.clearT>0||G.morph||p.vicious>0||p.grab||p.roll||p.kneel>0)return;
+  if(G.zombies.some(z=>z.boss&&!z.dead&&(z.state==="charge"||z.state==="wind")))return;
+  const px=p.x+p.w/2; let best=null, bd=1e9;
+  for(const z of G.zombies){ if(z.dead||z.boss||z.thrown||z.carried||z.emT>0||z.fly||z.y<GROUND-z.h-3)continue; const d=Math.abs(z.x+z.w/2-px)-(z.tier===3?70:0), sd=(z.x+z.w/2)>px?1:-1; if(!spotClear(px+sd*(z.tier===3?z.w*.5+26:44))||!spotClear(px+sd*22))continue; if(d>(z.tier===3?-40:36)&&d<150&&d<bd){ bd=d; best=z; } }
+  if(best)startFin(best); }
+function startFin(z,ki,oi,ci,KK){ const p=G.p; if(!FINBAG.length){ FINBAG=FKILL.map((_,i)=>i); for(let i=FINBAG.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [FINBAG[i],FINBAG[j]]=[FINBAG[j],FINBAG[i]]; } }
+  const bigT=!KK&&(z.boss||z.tier===3), BP=bigT?BKILL.filter(k=>!z.boss||k.boss):null, K=KK||(bigT?BP[(ki!=null?ki:BIGN++)%BP.length]:FKILL[ki!=null?ki:FINBAG.pop()]), O=FOPEN[bigT?0:(oi!=null?oi:Math.floor(Math.random()*FOPEN.length))]; if(z.boss){ z.state="stun"; z.stateT=9; } FINSEEN++; G.finK=0; G.finNeed=22+Math.floor(Math.random()*9);
+  const f=(z.x+z.w/2)>(p.x+p.w/2)?1:-1; p.face=p.mface=f; p.vx=0; p.roll=null; p.kneel=0; p.atkT=0; p.grab=null; p.reload=0; z.spinA=0; z.onCar=false; z.climbT=0; z.carried=true; z.finLock=true; z.face=K.back?f:-f; z.atkPh=0; z.kv=0; z.stagger=.5; z.fz=null;
+  const pre=[...(O.pre||[]),...(K.pre||[])].sort((a,b)=>a[0]-b[0]), vz=[...(O.vz||[]),...(K.vz||[])].sort((a,b)=>a[0]-b[0]);
+  G.lights.length=0; G.flash=0; G.parts=G.parts.filter(q=>q.k!=="f"&&q.k!=="m"); z.burn=0; for(const fr of (G.fires||[]))if(Math.abs(fr.x-(z.x+z.w/2))<300)fr.t=Math.min(fr.t,.12);
+  G.fin={t:0,z,K,O,k:K.n,f,hit:false,ht:K.ht||.5,dur:K.dur||FIN_T,cam:ci!=null?ci:Math.floor(Math.random()*3),seq:[...O.fr,...K.fr],pre,vz,c:null,held:null,pin:null,cx:(p.x+p.w/2+z.x+z.w/2)/2}; G.slow=0; G.floats.length=0; fireHeld=false;
+  if(!K.quiet){ tone(62,1.6,"sine",.16,34); nz(.9,.06,"lowpass",420,90); } }
+function finUpdate(dt){ const F=G.fin, p=G.p, z=F.z, K=F.K, px=p.x+p.w/2, f=F.f; F.t+=dt; p.vx=0; jumpBuf=0; p.y=GROUND-p.h; p.vy=0; p.onGround=true;
+  for(const o of G.zombies)if(o!==z&&!o.dead&&!o.boss&&Math.abs(o.x+o.w/2-px)<230)o.stagger=Math.max(o.stagger,.15);
+  if(!z.dead){ const dd=K.big?z.w*.5+(K.dd||24):(K.d||44), want=px+f*dd; if(z.boss){ const hw=z.x+z.w/2-f*dd; p.x+=(hw-p.w/2-p.x)*Math.min(1,dt*10); } else { const gap=want-z.w/2-z.x; if(Math.abs(gap)>8)z.walk+=dt*9; z.x+=gap*Math.min(1,dt*(F.t<.3?9:16)); } let up=0; if(K.lift){ for(const [t,v] of K.lift)if(F.t>=t)up=v; } z.liftY=(z.liftY||0)+(up-(z.liftY||0))*Math.min(1,dt*14); z.y=GROUND-z.h-z.liftY; z.face=K.back?f:-f; F.cx=(px+z.x+z.w/2)/2;
+    for(const [t,v] of F.vz)if(F.t>=t)z.fz=v;
+    while(F.pre.length&&F.t>=F.pre[0][0]){ const e=F.pre.shift(); e[1](F,z,f); } }
+  if(z.dead&&!F.hit){ F.hit=true; F.t=Math.max(F.t,F.dur-.2); }
+  if(!F.hit&&F.t>=F.ht){ F.hit=true; if(!z.dead){ z.fz=null; F.c=K.hit(F,z,f)||null; } if(K.quiet){ G.hitStop=Math.max(G.hitStop,.05); G.shake=Math.max(G.shake,4); } else { G.hitStop=Math.max(G.hitStop,.11); G.shake=Math.max(G.shake,14); SFX.crack(); SFX.flesh(); } }
+  if(F.hit&&K.post)K.post(F,dt,f);
+  if(F.pin&&F.c){ const h=heroPts()[5], R=F.c.rag; if(F.t<F.pin.until){ R.pins=[{i:F.pin.i,x:h.x,y:h.y,k:.7}]; } else { R.pins=[]; F.pin=null; } }
+  if(F.held&&F.t>=F.held.until){ const h=heroPts()[5], H=F.held; if(H.im!==undefined&&!H.heart)toss({k:"head",im:H.im,L:H.L,x:h.x,y:h.y,vx:H.vx,vy:H.vy,rot:0,vr:-f*12,life:8,gz:6}); else for(let i=0;i<6;i++)part("g",h.x,h.y,H.vx*(.5+Math.random())*.6,H.vy*(.5+Math.random()),.7,"#8c0b0f",2.4+Math.random()*2); F.held=null; SFX.whoosh(); }
+  if(F.t>=F.dur){ if(!z.dead){ z.carried=false; z.finLock=false; z.fz=null; z.liftY=0; } if(F.c&&F.c.rag)F.c.rag.pins=[]; G.fin=null; G.finCd=7; G.slow=0; } }
+function finPose(p,q){ const F=G.fin; let cur=null, t0=0; for(const [t,ps] of F.seq){ if(F.t>=t){ cur=ps; t0=t; } } if(!cur)return; Object.assign(q,cur); if(cur.snap&&F.t-t0>.06)q.snap=0; }
+function drawFinWorld(){ const F=G.fin; if(!F||!F.held)return; const h=heroPts()[5], H=F.held; ctx.save(); ctx.translate(h.x,h.y);
+  if(H.heart){ const b=1+.18*Math.sin(G.t*26); ctx.fillStyle="#8c0b0f"; ctx.beginPath(); ctx.arc(0,-2,4.2*b,0,6.28); ctx.fill(); ctx.fillStyle="#c2161c"; ctx.beginPath(); ctx.arc(-1,-3,2.2*b,0,6.28); ctx.fill(); }
+  else if(H.im){ ctx.rotate(F.f*(.3+Math.sin(G.t*9)*.06)); const sc=H.L/Math.max(H.im.width,H.im.height); ctx.scale(F.f,1); ctx.drawImage(H.im,-H.im.width*sc/2,-H.im.height*sc*.6,H.im.width*sc,H.im.height*sc); }
+  ctx.restore(); if(Math.random()<.6)part("g",h.x,h.y+6,(Math.random()-.5)*40,60+Math.random()*80,.5,"#a01014",1.6+Math.random()*1.6); }
+// how the victim holds itself while he has it
+function finZ(z,q){ const k=z.fz, t=G.t; if(k==="kneel"){ q.nTH=64; q.nSH=-128; q.fTH=14; q.fSH=-100; q.T=16; q.H=18+4*Math.sin(t*9); q.nUA=10; q.nFA=20; q.fUA=0; q.fFA=24; q.lift=0; }
+  else if(k==="gut"){ q.T=50; q.H=28; q.nUA=-14; q.nFA=84; q.fUA=-24; q.fFA=78; q.nTH=26; q.nSH=-34; q.fTH=6; q.fSH=-26; }
+  else if(k==="back"){ q.T=-24; q.H=-30; q.nUA=40; q.nFA=30; q.fUA=24; q.fFA=40; q.nTH=-8; q.nSH=-8; q.fTH=-24; q.fSH=-4; }
+  else if(k==="lift"){ q.T=-6; q.H=-22; q.nUA=126+8*Math.sin(t*17); q.nFA=44; q.fUA=118+8*Math.sin(t*15); q.fFA=48; q.nTH=12+10*Math.sin(t*13); q.nSH=-24; q.fTH=-14+10*Math.sin(t*11); q.fSH=-30; q.lift=0; }
+  else if(k==="feedz"){ q.nTH=76; q.nSH=-130; q.fTH=56; q.fSH=-118; q.lift=0; q.T=60; q.H=20; q.nUA=-34; q.nFA=44; q.fUA=-40; q.fFA=50; }
+  else if(k==="bow"){ q.nTH=64; q.nSH=-128; q.fTH=14; q.fSH=-100; q.lift=0; q.T=50+3*Math.sin(t*8); q.H=24; q.nUA=-30; q.nFA=24; q.fUA=-40; q.fFA=28; }
+  else if(k==="bowback"){ q.nTH=64; q.nSH=-128; q.fTH=14; q.fSH=-100; q.lift=0; q.T=-18; q.H=-34; q.nUA=40; q.nFA=30; q.fUA=24; q.fFA=40; q.snap=1; }
+  else if(k==="lunge"){ q.T=38; q.H=6; q.nUA=98; q.fUA=86; q.nFA=5; q.fFA=8; }
+  else { q.T=-8; q.H=-12+4*Math.sin(t*14); q.nUA=30+6*Math.sin(t*16); q.fUA=18; } return q; }
+// hit reactions in ordinary fighting: where it was hit decides how it folds
+function zReact(z,q){ const k=z.react.k; if(k==="gut"){ q.T=46; q.H=26; q.nUA=-10; q.nFA=72; q.fUA=-20; q.fFA=62; q.lift=3; q.nTH=32; q.nSH=-42; q.fTH=22; q.fSH=-32; } else { q.T=-30; q.H=-36; q.nUA=44; q.nFA=20; q.fUA=30; q.fFA=30; q.nTH=-10; q.fTH=-26; } if(z.react.t>.2)q.snap=1; return q; }
+let FINC=null, TSC=1;
+// the finisher camera: time ramps down into slow motion while the camera dollies past them (the far city slides one way, the near street the other), freezes on the hit, then snaps back to speed and pulls wide
+function finHitT(F){ return F.ht; }
+function finScale(F){ if(F.K.big){ const h=F.t-F.ht; return !F.hit?.5:(h<.16?.12:Math.min(1,.12+(h-.16)/.3*.88)); } if(F.K.quiet){ const h=F.t-F.ht; return (F.hit&&h<.1)?.2:.6; } const h=F.t-finHitT(F); if(!F.hit)return F.t<.12?1-(F.t/.12)*.72:.28; if(h<.16)return .12; return Math.min(1,.12+(h-.16)/.3*.88)*(F.dur>FIN_T?.8:1); }
+function finDolly(F){ if(F.cam===2||F.K.quiet)return 0; const u=Math.max(0,Math.min(1,F.t/.62)); return (F.f||1)*(F.cam===1?150:-150)*Math.cos(Math.PI*u*u*(3-2*u)); }
+function drawFinFx(){ const F=G.fin; if(!F)return; const cw=canvas.width, ch=canvas.height, k=cw/W, ht=finHitT(F), h=F.t-ht, ease=u=>{ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); };
+  if(!FINC)FINC=document.createElement("canvas"); if(FINC.width!==cw||FINC.height!==ch){ FINC.width=cw; FINC.height=ch; } const fx=FINC.getContext("2d"); fx.setTransform(1,0,0,1,0,0); fx.clearRect(0,0,cw,ch); fx.drawImage(canvas,0,0);
+  let c, r; const cm=F.K.quiet?3:(F.cam||0), end=Math.max(.2,F.dur-ht-.16); if(!F.hit){ const u=ease(F.t/ht); c=cm===2?1.25+.1*u:cm===1?1.15+.95*u:1.35+.55*u; r=(F.f||1)*(cm===1?(.09-.13*u):cm===2?0:(-.06+.1*u)); } else if(h<.16){ c=(cm===2?2.3:2.15)-h*1.2; r=(Math.random()-.5)*.03; } else { c=1.95-.95*ease((h-.16)/end); r=0; } if(cm===3){ r=0; c=!F.hit?1.08+.5*ease(F.t/ht):1.58-.58*ease(h/Math.max(.2,F.dur-ht)); }
+  const px=ZOOM*(F.cx-G.camX)*k, py=(GROUND+ZOOM*(F.K.big?(F.z.boss?-104:-84):-62))*k; if(F.K.big)c=1+(c-1)*(F.z.boss?.5:.66);
+  { const cin=ease(F.t/.16); c=1+(c-1)*cin; r*=cin; const wv=Math.min(1,(c-1)/.45); let tx=px+(cw/2-px)*wv, ty=py+(ch*.56-py)*wv; tx=Math.max(cw-c*(cw-px),Math.min(c*px,tx)); ty=Math.max(ch-c*(ch-py),Math.min(c*py,ty)); F._tx=tx; F._ty=ty; }      /* punches in over a few frames instead of cutting, and the frame is always full of picture */
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle="#040509"; ctx.fillRect(0,0,cw,ch); ctx.translate(F._tx,F._ty); ctx.rotate(r); ctx.scale(c,c); ctx.translate(-px,-py); ctx.drawImage(FINC,0,0); ctx.restore(); ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);
+  
+  const vg=ctx.createRadialGradient(W/2,H*.56,H*.24,W/2,H*.56,H*.9); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.6)"); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  const open=Math.min(1,F.t/.1,(F.dur-F.t)/.15), bar=H*.09*Math.max(0,open); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar); }
+// ---- what is in the windows: the dead at the glass, bodies hanging over the sills, and now and then one comes out head first
+const ZSIL={};
+function zSil(kind){ if(ZSIL[kind])return ZSIL[kind]; const nm=kind==="hang"?"z2":"z1"; if(!hrReady(nm))return null; const R=HR.rigs[nm], K=HR.K, cv=mkCv(HR.CW,HR.CH); let q, hip=null;
+  if(kind==="hang"){ const drop=-(R.th.len+R.sh.len), hyc=HR.CH*.42, lift=(HR.GY-drop*K-hyc)/K; q={T:172,H:20,nTH:180,nSH:0,fTH:176,fSH:6,nUA:-176,nFA:6,fUA:-166,fFA:-8,lift}; hip=hyc; }
+  else q={T:10,H:12,nTH:4,nSH:-6,fTH:-6,fSH:-6,nUA:118,nFA:-30,fUA:104,fFA:-18,lift:0};      // hands up on the glass
+  hrPose(nm,q,cv); const x=cv.getContext("2d"); x.globalCompositeOperation="source-atop"; x.fillStyle=kind==="hang"?"rgba(6,6,8,.55)":"rgba(4,4,6,.86)"; x.fillRect(0,0,cv.width,cv.height); x.globalCompositeOperation="source-over";
+  return ZSIL[kind]={cv,hip}; }
+function drawWindowDead(A,t){ const f=92/HR.CH;
+  for(const L of A.lit){ if(L.tv)continue; const S=zSil("glass"); if(!S)break; const sway=Math.sin(t*1.7+L.x)*2.2, bang=Math.max(0,Math.sin(t*3.1+L.x*.7))>.93?2:0, w=HR.CW*f*1.05, h=HR.CH*f*1.05;
+    ctx.save(); ctx.beginPath(); ctx.rect(L.x+1,L.y+1,L.w-2,L.h-2); ctx.clip(); ctx.drawImage(S.cv,L.x+L.w*.5-w/2+sway,L.y+4+bang,w,h); ctx.restore(); }
+  for(const Hg of (A.hang||[])){ const S=zSil("hang"); if(!S)break; const w=HR.CW*f, h=HR.CH*f, sy=Hg.y+Hg.h, cx=Hg.x+Hg.w*.5, rot=Math.sin(t*.9+Hg.x)*.035;
+    const g=ctx.createLinearGradient(0,sy,0,sy+86); g.addColorStop(0,"rgba(64,6,9,.8)"); g.addColorStop(1,"rgba(64,6,9,0)"); ctx.fillStyle=g; ctx.fillRect(cx-9,sy+30,4,56); ctx.fillRect(cx+5,sy+34,3,40);
+    ctx.save(); ctx.translate(cx,sy); ctx.rotate(rot); ctx.save(); ctx.beginPath(); ctx.rect(-Hg.w/2,-Hg.h,Hg.w,Hg.h); ctx.clip(); ctx.drawImage(S.cv,-w/2,-S.hip*f,w,h); ctx.restore();
+    ctx.beginPath(); ctx.rect(-60,0,120,120); ctx.clip(); ctx.drawImage(S.cv,-w/2,-S.hip*f,w,h); ctx.restore(); }
+  for(const B of (A.broken||[])){ ctx.fillStyle="#020203"; ctx.beginPath(); const hx=B.x+B.w*.5, hy=B.y+B.h*.52; for(let i=0;i<10;i++){ const a=i*.628, r=(i%2?11:21)+bhash(B.x+i*3)*7; ctx.lineTo(hx+Math.cos(a)*r,hy+Math.sin(a)*r*1.1); } ctx.closePath(); ctx.fill(); } }
+function fallerUpdate(dt){ if(G.stealth||LEVEL.indoor||G.dead||G.intro||G.clearT>0||G.bossDead)return; const p=G.p, px=p.x+p.w/2;
+  for(const sp of G.spots){ if(sp.type!=="window")continue; const A=BLD[Math.floor(sp.x)]; if(!A||!A.wins)continue; if(Math.abs(sp.x-px)>520){ sp.fallT=Math.min(sp.fallT??2,2); continue; }
+    sp.fallT=(sp.fallT??2.5)-dt; if(sp.fallT>0)continue; sp.fallT=3.5+Math.random()*4; if(G.zombies.filter(z=>!z.dead).length>46)continue;
+    const cand=A.wins.filter(w=>w.k>=1&&!(A.broken||[]).includes(w)&&!(A.hang||[]).includes(w)); if(!cand.length)continue; const Wn=cand[Math.floor(Math.random()*cand.length)]; (A.broken||(A.broken=[])).push(Wn);
+    const T=TIER[1], h=T.h*(.94+Math.random()*.12), wx=Wn.x+Wn.w/2, wy=Wn.y+Wn.h*.5, dir=wx<px?1:-1;
+    G.zombies.push({x:wx-h*.21,y:wy-h*.4,w:h*.42,h,tier:1,hp:T.hp,maxhp:T.hp,spd:(96+Math.random()*50),face:dir,walk:Math.random()*6,dead:false,hitFlash:0,dz:Math.round(Math.random()*8-2),stagger:.2,emerge:false,emT:0,emSpot:null,fly:true,vy:-160,fvx:dir*(60+Math.random()*90),fell:GROUND-wy,spinA:0});
+    for(let i=0;i<16;i++)part("s",wx+(Math.random()-.5)*26,wy+(Math.random()-.5)*30,dir*(40+Math.random()*220)+(Math.random()-.5)*120,-80-Math.random()*200,.5+Math.random()*.4,"#cfe4ff",1.3+Math.random()*1.2); SFX.glass(); SFX.groan(); G.shake=Math.max(G.shake,4); } }
+// ---- fire that stays: the street burns where the flamethrower has been
+function fireAt(x,life){ const Fs=G.fires||(G.fires=[]); for(const f of Fs)if(Math.abs(f.x-x)<22){ f.t=Math.max(f.t,life||2.4); return; } if(Fs.length>16)Fs.shift(); Fs.push({x,t:life||2.6,max:life||2.6,s:Math.random()*9}); }
+function fireUpdate(dt){ const Fs=G.fires; if(!Fs||!Fs.length)return; for(const f of Fs){ f.t-=dt; if(f.t<=0){ if(G.scorches.length<60)G.scorches.push(f.x); continue; }
+    for(const z of G.zombies){ if(z.dead||z.fly||z.thrown||z.carried||z.emT>0)continue; if(Math.abs(z.x+z.w/2-f.x)<26&&z.y+z.h>GROUND-12)z.burn=Math.max(z.burn||0,.7); }
+    for(const c of G.corpses){ if(c.rag&&!c.hero&&!c.rag.char&&Math.abs(c.x-f.x)<30){ c.rag.char=true; c.rag.bake=null; c.rag.asleep=false; c.rag.still=0; } }
+    if(Math.random()<dt*5)part("m",f.x+(Math.random()-.5)*20,GROUND-22,(Math.random()-.5)*14,-34-Math.random()*30,1.1,"#26262a",7+Math.random()*7);
+    if(Math.random()<dt*7)part("a",f.x+(Math.random()-.5)*24,GROUND-10-Math.random()*20,(Math.random()-.5)*30,-60-Math.random()*60,.9,"#ffb060",1.6);
+    G.lights.push({x:f.x,y:GROUND-16,r:92+Math.random()*26,life:.05,max:.05,col:"255,140,50"}); if(Math.random()<dt*3)SFX.crackle(); }
+  G.fires=Fs.filter(f=>f.t>0); }
+function drawFires(){ const Fs=G.fires; if(!Fs||!Fs.length)return; ctx.save(); ctx.globalCompositeOperation="lighter"; if(G.fin||G.chaos)ctx.globalAlpha=.3;
+  for(const f of Fs){ if(!vis(f.x-40,80))continue; const k=Math.min(1,f.t/.5,(f.max-f.t)/.25+.3), t=G.t*9+f.s;
+    for(let i=0;i<5;i++){ const ox=(i-2)*8+Math.sin(t*.7+i*2)*3, hgt=(16+12*Math.sin(t+i*1.7)+10*Math.sin(t*1.9+i))*k+10*k, w=6.5*k;
+      const g=ctx.createLinearGradient(0,GROUND+4,0,GROUND+4-hgt); g.addColorStop(0,"rgba(255,236,170,.85)"); g.addColorStop(.35,"rgba(255,150,40,.7)"); g.addColorStop(1,"rgba(200,50,16,0)"); ctx.fillStyle=g;
+      ctx.beginPath(); ctx.moveTo(f.x+ox-w,GROUND+5); ctx.quadraticCurveTo(f.x+ox-w*.9,GROUND+4-hgt*.5,f.x+ox+Math.sin(t*1.3+i)*5,GROUND+4-hgt); ctx.quadraticCurveTo(f.x+ox+w*.9,GROUND+4-hgt*.5,f.x+ox+w,GROUND+5); ctx.closePath(); ctx.fill(); }
+    const gg=ctx.createRadialGradient(f.x,GROUND+4,0,f.x,GROUND+4,34); gg.addColorStop(0,`rgba(255,170,60,${.34*k})`); gg.addColorStop(1,"rgba(255,170,60,0)"); ctx.fillStyle=gg; ctx.beginPath(); ctx.ellipse(f.x,GROUND+5,36,9,0,0,6.28); ctx.fill(); }
+  ctx.restore(); }
+// the jet itself: a pressurised stream that billows, three layers deep, with a pilot light when it is idle
+function drawFlameJet(){ const p=G.p; if(!(G.flameT>0)||G.dead)return; const m=gunMuzzle(), on=p.gunT>.08, t=G.t;
+  ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.translate(m.x,m.y); ctx.rotate(on?(G.flameA||0):(p.face>0?0:Math.PI));
+  if(!on){ const L=7+Math.sin(t*40)*1.5; const g=ctx.createLinearGradient(0,0,L,0); g.addColorStop(0,"rgba(150,200,255,.95)"); g.addColorStop(1,"rgba(255,170,60,0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(0,-1.6); ctx.quadraticCurveTo(L*.6,-2.6,L,0); ctx.quadraticCurveTo(L*.6,2.6,0,1.6); ctx.fill(); ctx.restore(); return; }
+  const LL=FLAME_RANGE*(.92+.08*Math.sin(t*31));
+  const layer=(len,wid,c0,c1,c2,ph)=>{ const N=14, top=[], bot=[]; for(let i=0;i<=N;i++){ const u=i/N, x=u*len, bell=Math.pow(u,.55)*(1-Math.pow(u,5)), wob=(Math.sin(u*9-t*26+ph)*.22+Math.sin(u*21-t*43+ph*2)*.12)*u, w=wid*bell, cy=Math.sin(u*5-t*17+ph)*wid*.16*u-u*u*14; top.push([x,cy-w*(1+wob)]); bot.push([x,cy+w*(1-wob)]); }
+    const g=ctx.createLinearGradient(0,0,len,0); g.addColorStop(0,c0); g.addColorStop(.4,c1); g.addColorStop(1,c2); ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(0,0); for(const q of top)ctx.lineTo(q[0],q[1]); for(let i=bot.length-1;i>=0;i--)ctx.lineTo(bot[i][0],bot[i][1]); ctx.closePath(); ctx.fill(); };
+  layer(LL,34,"rgba(255,120,30,.55)","rgba(230,70,20,.42)","rgba(150,30,10,0)",0);
+  layer(LL*.86,22,"rgba(255,200,90,.75)","rgba(255,140,40,.55)","rgba(230,80,20,0)",2.1);
+  layer(LL*.6,10,"rgba(255,252,236,.95)","rgba(255,226,140,.7)","rgba(255,170,60,0)",4.2);
+  const bg=ctx.createRadialGradient(4,0,0,4,0,16); bg.addColorStop(0,"rgba(190,220,255,.9)"); bg.addColorStop(1,"rgba(120,170,255,0)"); ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(4,0,16,0,6.28); ctx.fill();
+  ctx.restore(); }
+// ---- the game opens quiet. he has a knife. the dead have not noticed him yet. stay behind them and he kills without a sound, until one of them sees him and the whole street wakes up.
+{ const c=document.createElement("canvas"); c.width=96; c.height=24; const x=c.getContext("2d"); x.fillStyle="#17181c"; x.fillRect(0,8,34,9); x.fillStyle="#2a2c33"; for(let i=4;i<32;i+=6)x.fillRect(i,8,2,9); x.fillStyle="#3c3e46"; x.fillRect(33,5,4,15);
+  const g=x.createLinearGradient(0,6,0,18); g.addColorStop(0,"#dfe6ee"); g.addColorStop(.5,"#8f98a4"); g.addColorStop(1,"#c9d1da"); x.fillStyle=g; x.beginPath(); x.moveTo(37,7); x.lineTo(80,7); x.lineTo(95,12); x.lineTo(78,18); x.lineTo(37,18); x.closePath(); x.fill(); x.fillStyle="rgba(0,0,0,.25)"; x.fillRect(37,12,45,1.2); IMG.g_knife=c; }
+GUNS.knife={one:true,L:12,grip:[.18,.5],fore:null,muz:[1,.5],hold:[22,8],low:[13,17,68]};
+WPN.knife={name:"KNIFE",mag:1,reload:0,cd:.3,dmg:0,spd:0,n:0,spread:0,jit:0,life:0,kb:0,ammo:Infinity,crit:0,shake:0,frame:"pistol",light:0};
+function mkSleeper(x,type,face){ const T=TIER[1], h=T.h*(.95+Math.random()*.1), z={x:x-h*.21,y:GROUND-h,w:h*.42,h,tier:1,hp:T.hp,maxhp:T.hp,spd:120+Math.random()*40,face,walk:Math.random()*6,dead:false,hitFlash:0,dz:Math.round(Math.random()*8-3),stagger:0,emerge:false,emT:0,emSpot:null,fly:false,sl:{type,aw:0,x0:x,t:Math.random()*3}}; G.zombies.push(z); return z; }
+function startStealth(){ if(LV!==0||QS.has("nostealth"))return; G.stealth={t:0,kills:0,ghost:true,cd:0,tgt:null,bag:[]}; G.weapon="knife"; G.mag=1; G.card=0;
+  const f=mkSleeper(432,"feed",1); try{ const im=zSnap(f); if(im&&im.width)G.corpses.push({end:1.5,im,x:f.x+f.w+6,h:f.h,w:f.w,face:1,dir:1,vx:0,t:6,head:false}); }catch(e){} for(let i=0;i<5;i++)decal(f.x+f.w+20+Math.random()*50,16+Math.random()*22);
+  mkSleeper(700,"back",1); mkSleeper(850,"patrol",1); mkSleeper(1010,"feed",1); mkSleeper(1150,"back",1); mkSleeper(1420,"watch",-1); }
+function sleeperUpdate(z,dt){ const S=z.sl, p=G.p, px=p.x+p.w/2, zx=z.x+z.w/2, dx=px-zx, ad=Math.abs(dx); S.t+=dt; z.y=GROUND-z.h; if(z.finLock)return;
+  if(S.type==="patrol"){ const ph=S.t%6, dir=ph<2.4?1:ph<3?0:ph<5.4?-1:0; if(dir){ z.face=dir; z.x+=dir*26*dt; z.walk+=dt*2.2; } } else z.walk+=dt*.35;
+  const front=dx*z.face>0, R=S.type==="feed"?60:S.type==="watch"?330:170, seen=front&&ad<R&&p.y+p.h>GROUND-70&&!p.roll;
+  if(seen)S.aw+=dt*(S.type==="watch"?2.6:(1.1+(1-ad/R)*1.7)); else S.aw=Math.max(0,S.aw-dt*.5);
+  if(S.aw>=1&&!G.chaos&&!G.fin){ if(S.type!=="watch"&&G.stealth)G.stealth.ghost=false; startChaos(z); } }
+function sleepZ(z,q){ const S=z.sl, t=G.t+z.x*.01, alert=Math.min(1,S.aw*1.4);
+  if(z.scream){ q.T=-13+Math.sin(t*40)*1.5; q.H=-32; q.nUA=-38; q.fUA=-50; q.nFA=52; q.fFA=46; q.nTH=14; q.nSH=-18; q.fTH=-18; q.fSH=-8; return q; }
+  if(S.type==="feed"){ const yank=((t*.77)%1)<.13; q.nTH=76; q.nSH=-130; q.fTH=56; q.fSH=-118; q.lift=0; q.T=yank?42:62+5*Math.sin(t*5.2); q.H=(yank?-12:22+15*Math.sin(t*9.4))-alert*30; q.nUA=yank?-8:-34+12*Math.sin(t*8.6); q.nFA=yank?86:44+18*Math.sin(t*8.6+1); q.fUA=yank?-16:-40+12*Math.sin(t*7.9+2); q.fFA=yank?80:50+16*Math.sin(t*7.9+2.6); if(yank)q.snap=1; return q; }
+  if(S.type==="patrol"&&alert<.2)return q;
+  q.T=16+2*Math.sin(t*1.3)-alert*14; q.H=26+5*Math.sin(t*.9)-alert*34; q.nUA=8+3*Math.sin(t*1.1); q.nFA=12; q.fUA=-4; q.fFA=14; q.nTH=5; q.nSH=-8; q.fTH=-7; q.fSH=-6; q.lift=0; return q; }      // slumped on its feet, swaying. the head comes up as it notices
+function stealthUpdate(dt){ const S=G.stealth, p=G.p, px=p.x+p.w/2; S.t+=dt; G.card=0; G.spawnT=Math.max(G.spawnT||0,2); if(S.cd>0)S.cd-=dt;
+  let best=null, bd=1e9; for(const z of G.zombies){ if(z.dead||!z.sl)continue; const d=Math.abs(z.x+z.w/2-px); if(d<bd){ bd=d; best=z; } }
+  S.tgt=null; if(best&&bd<56&&onStreet()&&!p.roll&&spotClear(px+(((best.x+best.w/2)>px)?1:-1)*22)){ const behind=((best.x+best.w/2)-px)*best.face>0; if(behind||best.sl.type==="feed"||best.sl.aw<.45)S.tgt=best; }
+  if(S.tgt&&(fireHeld||(TOUCHMODE&&AUTOFIRE))&&!(S.cd>0)&&!G.fin){ const z=S.tgt, feed=z.sl.type==="feed"; fireHeld=false; if(!S.bag.length){ S.bag=SKILL.map((k,i)=>i).filter(i=>!SKILL[i].feed); S.bag.sort(()=>Math.random()-.5); }
+    const K=feed?SKILL.find(k=>k.feed):SKILL[S.bag.pop()]; startFin(z,null,0,3,K); S.kills++; S.cd=.5; }
+  if(!fireHeld)return; }
+const KN={gx:12,gy:15,gA:64}, MOUTH={fUA:96,fFA:-24};
+const SKILL=[
+  {n:"slit",back:1,quiet:1,d:22,vz:[[0,"grab"],[.3,"back"]],fr:[[0,{...STN,...MOUTH,gx:8,gy:6,gA:20,T:8}],[.30,{...STN,...MOUTH,gx:27,gy:-7,gA:-18,T:10}],[.5,{...STN,...MOUTH,gx:5,gy:-5,gA:14,T:2,snap:1}],[.8,{...STN,...KN,fUA:44,fFA:40,T:16}],[1.05,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x+f*6,a.hy+12,20,f,1.6); SFX.flesh(); return ragKill(z,f,{vx:f*20,vy:20,spin:.5}); }},
+  {n:"kidney",back:1,quiet:1,d:23,ht:.6,vz:[[0,"grab"],[.36,"back"]],fr:[[0,{...STN,...MOUTH,gx:16,gy:13,gA:8,T:10}],[.34,{...STN,...MOUTH,gx:29,gy:13,gA:4,T:14,snap:1}],[.41,{...STN,...MOUTH,gx:15,gy:13,gA:8}],[.47,{...STN,...MOUTH,gx:29,gy:11,gA:2,T:14,snap:1}],[.54,{...STN,...MOUTH,gx:14,gy:4,gA:-10}],[.6,{...STN,...MOUTH,gx:28,gy:-7,gA:-12,T:12,snap:1}],[.85,{...STN,...KN,T:14}],[1.05,{}]],
+    pre:[[.35,(F,z,f)=>{ const a=zc(z); blood(a.x,a.y+6,6,-f,1); SFX.flesh(); }],[.48,(F,z,f)=>{ const a=zc(z); blood(a.x,a.y+4,6,-f,1); SFX.flesh(); }]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.hy+12,16,-f,1.4); SFX.flesh(); return ragKill(z,f,{vx:f*10,vy:20,spin:.4}); }},
+  {n:"chin",back:1,quiet:1,d:22,vz:[[0,"grab"],[.5,"back"]],fr:[[0,{...STN,...MOUTH,gx:15,gy:11,gA:-60,T:10}],[.30,{...STN,...MOUTH,gx:19,gy:8,gA:-74,T:10}],[.5,{...STN,...MOUTH,gx:21,gy:-11,gA:-84,T:4,snap:1}],[.8,{...STN,...KN,T:12}],[1.05,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.hy+6,14,0,1.4); SFX.flesh(); SFX.crack(); return ragKill(z,f,{vx:f*10,vy:-30,spin:.3}); }},
+  {n:"snap",back:1,quiet:1,d:22,ht:.47,vz:[[0,"grab"]],fr:[[0,{...NG,...STN,nUA:60,nFA:20,fUA:50,fFA:30,T:8}],[.30,{...NG,...STN,nUA:84,nFA:4,fUA:74,fFA:14,T:14}],[.47,{...NG,...STN,nUA:98,nFA:-34,fUA:58,fFA:54,T:8,H:8,snap:1}],[.7,{...NG,nUA:30,nFA:20,fUA:10,fFA:30,T:6}],[1.0,{}]],
+    hit:(F,z,f)=>{ SFX.crack(); SFX.crack(); return ragKill(z,f,{vx:0,vy:30,spin:.5}); }},
+  {n:"skull",back:1,quiet:1,d:23,vz:[[0,"grab"]],fr:[[0,{...STN,...MOUTH,gx:8,gy:-10,gA:70,T:-2}],[.30,{...STN,...MOUTH,gx:9,gy:-25,gA:88,T:-6}],[.5,{...STN,...MOUTH,gx:23,gy:-13,gA:98,T:16,snap:1}],[.8,{...STN,...KN,T:12}],[1.05,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.hy,10,0,1.2); SFX.crack(); SFX.flesh(); return ragKill(z,f,{vx:f*10,vy:70,spin:.3}); }},
+  {n:"heart",back:1,quiet:1,d:23,ht:.5,vz:[[0,"grab"],[.5,"back"]],fr:[[0,{...STN,...MOUTH,gx:8,gy:8,gA:0,T:6}],[.30,{...STN,...MOUTH,gx:6,gy:7,gA:0,T:2}],[.5,{...STN,...MOUTH,gx:29,gy:4,gA:0,T:16,snap:1}],[.63,{...STN,...MOUTH,gx:29,gy:4,gA:42,T:16,snap:1}],[.85,{...STN,...KN,T:12}],[1.05,{}]],
+    pre:[[.63,(F,z,f)=>{ SFX.crack(); }]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x+f*8,a.y-8,16,f,1.5); SFX.flesh(); return ragKill(z,f,{vx:f*10,vy:20,spin:.3}); }},
+  {n:"kneel",back:1,quiet:1,d:25,ht:.58,vz:[[0,"grab"],[.36,"kneel"]],fr:[[0,{...STN,...MOUTH,...KN,T:8}],[.30,{...MOUTH,...KN,nTH:54,nSH:-10,T:-4,snap:1}],[.42,{...STN,fUA:70,fFA:-10,gx:10,gy:-20,gA:86,T:2}],[.58,{...STN,fUA:70,fFA:-10,gx:22,gy:2,gA:98,T:24,snap:1}],[.85,{...STN,...KN,T:12}],[1.05,{}]],
+    pre:[[.33,(F,z,f)=>{ SFX.thunk(); }]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,a.hy+22,14,0,1.3); SFX.flesh(); SFX.crack(); return ragKill(z,f,{vx:f*10,vy:60,spin:.2}); }},
+  {n:"feeder",feed:1,quiet:1,d:26,ht:.52,vz:[[0,"feedz"]],fr:[[0,{...STN,...KN,fUA:30,fFA:50,T:14}],[.30,{...STN,fUA:60,fFA:20,gx:8,gy:-22,gA:88,T:-6}],[.52,{nTH:44,nSH:-76,fTH:16,fSH:-58,fUA:50,fFA:40,gx:25,gy:15,gA:98,T:36,snap:1}],[.85,{...STN,...KN,T:14}],[1.05,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x,z.y+z.h*.45,14,0,1.2); SFX.flesh(); SFX.crack(); return ragKill(z,f,{vx:f*20,vy:80,spin:.2}); }} ];
+function stealthPose(p,q,moving){ const ph=p.run/4*6.2832, c=Math.cos(ph), s=Math.sin(ph); if(!p.onGround)return; Object.assign(q,KN); q.gun="knife"; q.gx2=null; q.fUA=24; q.fFA=56;
+  if(moving){ q.T=20+1.5*s; q.H=-4; q.nTH=10+24*c; q.nSH=-(30+36*Math.max(0,-s)); q.fTH=10-24*c; q.fSH=-(30+36*Math.max(0,s)); q.lift=.8*Math.abs(s); }
+  else { q.T=17+Math.sin(G.t*2)*1; q.H=-6; q.nTH=26; q.nSH=-36; q.fTH=-14; q.fSH=-24; } }
+// ---- then one of them sees him
+const CH={cut:.95,thr:1.2,hit:1.42,draw:1.62,wide:2.55,end:3.15};
+function startChaos(z){ if(G.chaos||!G.stealth)return; const p=G.p; G.chaos={t:0,z,f:(z.x+z.w/2)>(p.x+p.w/2)?1:-1,kn:null,hit:false,in0:ANYIN,frz:0}; G.lights.length=0; z.sl.aw=1; z.scream=true; z.face=-G.chaos.f; fireHeld=false; p.vx=0; G.flash=.35; G.floats.length=0; SFX.thunder(); SFX.roar(); SFX.snarl(); G.shake=Math.max(G.shake,8); }
+function endChaos(){ const S=G.stealth; G.chaos=null; G.stealth=null; G.weapon="pistol"; G.ammo=Infinity; G.mag=WPN.pistol.mag; for(const z of G.zombies){ if(z.sl){ z.sl=null; z.scream=false; z.stagger=0; } } G.card=3.6; G.spawnT=0; G.lvT=0; TSC=1; G.barsOut=.5;
+  if(S&&S.ghost&&S.kills>=5){ G.score+=2000; banner("GHOST","not a sound. until now.",GOLD); } SFX.groan(); SFX.roar(); }
+function chaosScene(dt){ const C=G.chaos, p=G.p, z=C.z; if(C.frz>0){ C.frz-=dt; return; } C.t+=dt; const t=C.t, d2=dt*(t>CH.cut&&t<CH.wide?.55:1), px=p.x+p.w/2; TSC=d2/dt; G.t+=d2; ambient(d2); fxUpdate(d2);
+  p.vx=0; p.vy=0; p.y=GROUND-p.h; p.onGround=true; p.face=p.mface=C.f;
+  for(const o of G.zombies){ if(o.dead||!o.sl||o===z)continue; if(t>.5){ o.face=(px>o.x+o.w/2)?1:-1; o.sl.aw=Math.min(1,o.sl.aw+dt*2); if(t>1&&!o.scream){ o.scream=true; if(Math.random()<.5)SFX.groan(); } } }
+  if(t>=CH.thr&&!C.kn&&!C.hit&&!z.dead){ const h=heroPts()[5]; C.kn={x:h.x,y:h.y,sx:h.x,sy:h.y,rot:0}; SFX.whoosh(); }
+  if(C.kn){ const tx=z.x+z.w/2, ty=z.y+z.h*.1, u=Math.min(1,(t-CH.thr)/(CH.hit-CH.thr)); C.kn.x=C.kn.sx+(tx-C.kn.sx)*u; C.kn.y=C.kn.sy+(ty-C.kn.sy)*u-Math.sin(u*3.14)*10; C.kn.rot+=d2*46*C.f;
+    if(u>=1){ C.kn=null; C.hit=true; C.frz=.11; blood(tx,ty,20,C.f,1.6); boneFx(tx,ty,4,C.f); SFX.head(); SFX.crack(); G.shake=Math.max(G.shake,12); z.scream=false; z.sl=null; ragKill(z,C.f,{vx:C.f*170,vy:-90,spin:-2.6,at:3}); } }
+  if(t>=CH.draw&&!C.drawn){ C.drawn=true; G.weapon="pistol"; G.mag=WPN.pistol.mag; SFX.drawGun(); if(p.cs){ p.cs.v-=260; p.cs.bv-=160; } } if(t>=CH.draw+.62&&!C.rack){ C.rack=1; SFX.rack(); }
+  const zx=z.x+z.w/2, e=u=>{ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); };
+  C.shot=t<CH.cut?{c:2.2+.2*e(t/CH.cut),r:.03,f:{x:zx,y:GROUND-z.h*.74}}:t<CH.wide?{c:1.9+.25*e((t-CH.cut)/(CH.wide-CH.cut)),r:-.03*C.f,f:{x:px+C.f*26,y:p.y+p.h*.36}}:{c:2.15-1.15*e((t-CH.wide)/(CH.end-CH.wide)),r:0,f:{x:px+C.f*80,y:GROUND-70}};
+  { const tz=t<CH.wide?1.25:1.25-.25*e((t-CH.wide)/(CH.end-CH.wide)); setZoom(ZOOM+(tz-ZOOM)*Math.min(1,dt*4)); const tc=Math.max(0,Math.min(LEVEL.w-VW,(px+zx)/2-VW/2)); G.camX+=(tc-G.camX)*Math.min(1,dt*3); }
+  for(const o of G.zombies){ o.px=o.x; o.py=o.y; } p.px=p.x; p.py=p.y; for(const c of G.cats){ c.px=c.x; c.py=c.y; } G.pcam=G.camX;
+  if(t>=CH.end||(t>.6&&(fireHeld||keys.size||ANYIN!==C.in0))){ if(!C.hit&&!z.dead){ z.sl=null; z.scream=false; } endChaos(); } }
+function chaosPose(p,q){ const C=G.chaos, t=C.t; q.nTH=18; q.nSH=-14; q.fTH=-18; q.fSH=-6; q.gx2=null;
+  if(t<CH.thr){ const u=Math.max(0,(t-CH.cut+.1)/(CH.thr-CH.cut+.1)); q.gun="knife"; q.gx=12-20*u; q.gy=15-27*u; q.gA=64-190*u; q.T=17-28*u; q.H=-10; q.fUA=24+50*u; q.fFA=56-40*u; }
+  else if(t<CH.draw){ q.gun=null; q.nUA=98; q.nFA=-4; q.fUA=-20; q.fFA=40; q.T=22; q.H=-6; if(t<CH.thr+.07)q.snap=1; }
+  else { const k=Math.min(1,(t-CH.draw)/.55), e=k*k*(3-2*k), g=GUNS.pistol; q.gun="pistol"; q.gx=5+(g.hold[0]-5)*e; q.gy=24+(g.hold[1]-24)*e; q.gA=86*(1-e); q.gx2=q.gx-2.5; q.gy2=q.gy-5; q.gA2=q.gA; q.T=2+9*e; q.H=-5; } }
+function cropShot(sh){ const cw=canvas.width, ch=canvas.height, k=cw/W; if(!sh||(sh.c<=1.001&&Math.abs(sh.r||0)<.001))return; if(!FINC)FINC=document.createElement("canvas"); if(FINC.width!==cw||FINC.height!==ch){ FINC.width=cw; FINC.height=ch; } const fx=FINC.getContext("2d"); fx.setTransform(1,0,0,1,0,0); fx.clearRect(0,0,cw,ch); fx.drawImage(canvas,0,0);
+  const px=ZOOM*(sh.f.x-G.camX)*k, py=(GROUND+ZOOM*(sh.f.y-GROUND))*k, sc=Math.max(sh.c,1+Math.abs(sh.r||0)*1.2); ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle="#040509"; ctx.fillRect(0,0,cw,ch); ctx.translate(cw/2,ch*.55); ctx.rotate(sh.r||0); ctx.scale(sc,sc); ctx.translate(-px,-py); ctx.drawImage(FINC,0,0); ctx.restore(); ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0); }
+function drawChaosFx(){ const C=G.chaos; if(!C)return; cropShot(C.shot); const vg=ctx.createRadialGradient(W/2,H*.56,H*.24,W/2,H*.56,H*.9); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.6)"); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  if(C.t<.2){ ctx.fillStyle=`rgba(236,242,255,${(1-C.t/.2)*.2})`; ctx.fillRect(0,0,W,H); } if(C.frz>0){ ctx.fillStyle=`rgba(255,244,236,${C.frz*.7})`; ctx.fillRect(0,0,W,H); }
+  const open=Math.min(1,C.t/.12,(CH.end-C.t)/.3), bar=H*.11*Math.max(0,open); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar); }
+function drawStealthMarks(){ const S=G.stealth; if(!S||G.fin||G.chaos||G.intro)return; for(const z of G.zombies){ if(z.dead||!z.sl||!vis(z.x,z.w))continue; const cx=z.x+z.w/2, y=z.y-12, aw=z.sl.aw;
+    if(aw>.03){ ctx.lineWidth=2; ctx.strokeStyle="rgba(0,0,0,.5)"; ctx.beginPath(); ctx.arc(cx,y,6,0,6.28); ctx.stroke(); ctx.strokeStyle=aw>.6?"#e23b2e":"rgba(244,237,224,.9)"; ctx.beginPath(); ctx.arc(cx,y,6,-1.5708,-1.5708+aw*6.2832); ctx.stroke(); }
+    else if(S.tgt===z){ ctx.fillStyle="rgba(244,237,224,.9)"; ctx.beginPath(); ctx.moveTo(cx-4,y-4); ctx.lineTo(cx+4,y-4); ctx.lineTo(cx,y+2); ctx.closePath(); ctx.fill(); } } }
+// ---- he moves like a man who has done this before: a low roll through them that comes up shooting
+let ROLLREQ=0;
+function rollUpdate(dt,dir){ const p=G.p; if(p.rollCd>0)p.rollCd-=dt; if(p.kneel>0)p.kneel-=dt;
+  if(ROLLREQ){ ROLLREQ=0; if(!p.roll&&!(p.rollCd>0)&&p.onGround&&!G.fin&&!G.swap&&!G.chaos&&!G.intro&&!(p.atkT>0&&(p.atkType==="throw"||p.atkType==="exec"))){ p.roll={t:0,d:.46,dir:dir||p.mface||1}; p.atkT=0; SFX.whoosh(); nz(.25,.07,"lowpass",600,200); } }
+  if(!p.roll)return false; const R=p.roll; R.t+=dt; p.vx=R.dir*(G.stealth?330:460)*(1-.4*(R.t/R.d)); p.mface=R.dir; if(p.gunT<=0)p.face=R.dir;
+  if(Math.random()<dt*30)part("m",p.x+p.w/2-R.dir*10,GROUND-4,-R.dir*(30+Math.random()*60),-10-Math.random()*30,.35,"#8a94a4",4+Math.random()*4);
+  if(R.t>=R.d){ p.roll=null; p.rollCd=.35; p.kneel=.34; p.rollShot=.6; } return true; }
+function rollPose(p,q){ if(p.roll){ const u=Math.min(1,p.roll.t/p.roll.d), bell=Math.sqrt(Math.max(0,Math.sin(Math.PI*u))), k=u<.76?1:Math.max(0,1-(u-.76)/.24); q.T=8+78*bell; q.H=44*bell; q.nTH=84+34*k; q.nSH=-124-26*k; q.fTH=-34+142*k; q.fSH=-70-72*k; q.lift=0; q.gx=9; q.gy=11; q.gA=38; if(q.gx2!=null){ q.gx2=7; q.gy2=9; q.gA2=38; } q.fUA=40; q.fFA=80; q.snap=1; return; }      /* a tight ball: chin down, knees to the chest, guns held in */
+  if(p.kneel>0&&p.onGround&&Math.abs(p.vx)<110&&!(p.atkT>0)){ q.nTH=84; q.nSH=-124; q.fTH=-34; q.fSH=-70; q.T=8; q.lift=0; } }      // comes up on one knee, guns already level
+// ---- the big ones do not die from one move. tanks and bosses get a combo: break them down, then finish it.
+const AIMLOW={gx:22,gy:17,gA:52,gx2:20,gy2:15,gA2:50,T:8}, AIMMID={gx:27,gy:6,gA:4,gx2:25,gy2:4,gA2:2,T:6};
+function zHP(z){ return rigPts(z,z.boss?"boss":"z"+z.tier,z._q||{}).pts[3]; }
+function shotAt(z,f,low){ const a=zc(z), y=low?z.y+z.h*.78:a.y; gunFlash(a.x-f*z.w*.45,y); blood(a.x-f*z.w*.2,y,10,-f,1.2); boneFx(a.x-f*z.w*.2,y,3,-f); }
+function bigKill(z,f,opt){ if(!z.boss)return ragKill(z,f,opt); G.finKill=true; z.finLock=false; G.killPow=Object.assign({vx:0,vy:0,spin:0},opt); const rg=makeRag(z,f,"melee","boss"); G.killPow=null; killBoss(z); G.flash=0; G.finKill=false; if(!rg)return null;
+  const c={rag:rg,x:rg.pts[0].x,h:z.h,w:z.w,face:z.face,dir:f,t:0,head:rg.noHead,big:true}; G.corpses.push(c); return c; }
+function bossFinOK(z){ const p=G.p; return !G.fin&&!G.dead&&!G.chaos&&!G.intro&&onStreet()&&!p.roll&&hrReady("boss")&&hrReady("op")&&Math.abs((z.x+z.w/2)-(p.x+p.w/2))<560&&!G.platforms.some(q=>q.type!=="ground"&&q.x<Math.max(z.x+z.w/2,p.x+p.w/2)&&q.x+q.w>Math.min(z.x+z.w/2,p.x+p.w/2)); }
+let BIGN=0;
+const BKILL=[
+  {n:"dismantle",big:1,boss:1,ht:1.15,dur:1.75,dd:26,vz:[[.5,"bow"],[.64,"bowback"],[.72,"bow"],[.82,"bowback"],[.9,"bow"]],
+    fr:[[.22,AIMLOW],[.56,{gx:5,gy:6,gA:-28,T:-4}],[.62,{gx:37,gy:-2,gA:-6,T:16,snap:1}],[.74,{gx2:3,gy2:6,gA2:-24,T:-2}],[.8,{gx2:39,gy2:-3,gA2:-4,T:22,snap:1}],[.95,{gx:24,gy:-4,gA:-8,gx2:31,gy2:-10,gA2:-2,T:8}],[1.15,{gx:20,gy:-4,gA:-20,gx2:27,gy2:-10,gA2:-14,T:2,snap:1}],[1.5,{}]],
+    pre:[[.32,(F,z,f)=>{ shotAt(z,f,1); SFX.crack(); }],[.46,(F,z,f)=>{ shotAt(z,f,1); SFX.crack(); G.shake=Math.max(G.shake,10); }],
+      [.63,(F,z,f)=>{ const h=zHP(z); burstFx(h.x,h.y,"#fff4d0",6); blood(h.x,h.y,8,f,1.2); SFX.melee(); G.hitStop=Math.max(G.hitStop,.04); G.shake=Math.max(G.shake,8); }],
+      [.81,(F,z,f)=>{ const h=zHP(z); burstFx(h.x,h.y,"#fff4d0",6); blood(h.x,h.y,8,f,1.2); boneFx(h.x,h.y,4,f); SFX.melee(); SFX.crack(); G.hitStop=Math.max(G.hitStop,.04); G.shake=Math.max(G.shake,9); }]],
+    hit:(F,z,f)=>{ const h=zHP(z); gunFlash(h.x-f*10,h.y,true); gunFlash(h.x+f*6,h.y); blood(h.x,h.y,36,0,2.2); gibs(h.x,h.y,13,0); boneFx(h.x,h.y,10,0); SFX.head(); return bigKill(z,f,{vx:f*40,vy:-60,noHead:true,spin:.5}); }},
+  {n:"judoslam",big:1,ht:.86,dur:1.85,dd:20,vz:[[.3,"lift"]],lift:[[.36,0],[.5,40],[.7,70]],
+    fr:[[.22,{...NG,...STN,nUA:92,nFA:0,fUA:80,fFA:10,T:12}],[.44,{...NG,...STN,nUA:150,nFA:-8,fUA:140,fFA:-6,T:-8}],[.7,{...NG,...STN,nUA:172,nFA:-10,fUA:164,fFA:-8,T:-16}],[.86,{...NG,nUA:38,nFA:10,fUA:28,fFA:14,T:38,nTH:38,nSH:-44,fTH:-24,fSH:-8,snap:1}],[1.02,{gx:20,gy:17,gA:72,gx2:18,gy2:15,gA2:70,T:20}],[1.6,{}]],
+    hit:(F,z,f)=>{ const a=zc(z); G.shake=Math.max(G.shake,22); SFX.boom(); SFX.thunk(); SFX.crack(); for(let i=0;i<12;i++)part("m",a.x+f*30+(Math.random()-.5)*90,GROUND-4,(Math.random()-.5)*220,-30-Math.random()*60,.6,"#6a6c74",9+Math.random()*9); decal(a.x+f*30,54); F.shots=[1.08,1.22,1.36]; return bigKill(z,f,{vx:f*80,vy:1100,spin:-1.4}); },
+    post:(F,dt,f)=>{ if(F.c&&F.shots&&F.shots.length&&F.t>=F.shots[0]){ F.shots.shift(); const last=!F.shots.length, b=F.c.rag.pts[last?3:1], h=heroPts()[5]; gunFlash(h.x+f*6,h.y+4); ragPush(F.c,0,260); blood(b.x,b.y,14,0,1.5); if(last){ F.c.rag.noHead=true; F.c.rag.bake=null; gibs(b.x,b.y,10,0); boneFx(b.x,b.y,8,0); SFX.head(); G.hitStop=Math.max(G.hitStop,.06); } } }},
+  {n:"kneeface",big:1,boss:1,ht:.92,dur:1.6,dd:30,vz:[[.34,"bow"],[.5,"bowback"],[.72,"bow"]],
+    fr:[[.22,{nTH:62,nSH:-8,T:-6,snap:1}],[.4,{...NG,nTH:84,nSH:-112,T:12,nUA:70,nFA:10,fUA:60,fFA:14}],[.47,{...NG,nTH:104,nSH:-100,T:-4,nUA:70,nFA:10,fUA:60,fFA:14,snap:1}],[.66,{T:-8,nTH:34,nSH:-86,fTH:-6,fSH:-12}],[.92,{T:-28,H:6,nTH:112,nSH:6,fTH:-12,fSH:-4,lift:2,snap:1}],[1.15,{T:-10,nTH:52,nSH:-66}],[1.4,{}]],
+    pre:[[.3,(F,z,f)=>{ const a=zc(z); SFX.crack(); SFX.thunk(); boneFx(a.x,z.y+z.h*.78,5,f); G.shake=Math.max(G.shake,9); }],[.48,(F,z,f)=>{ const h=zHP(z); burstFx(h.x,h.y,"#fff4d0",7); blood(h.x,h.y,12,f,1.4); boneFx(h.x,h.y,4,f); SFX.melee(); SFX.thunk(); G.hitStop=Math.max(G.hitStop,.05); G.shake=Math.max(G.shake,11); }]],
+    hit:(F,z,f)=>{ const h=zHP(z); headToss(z,h.x,h.y,f*480,-760,f*20); blood(h.x,h.y,28,f,2); boneFx(h.x,h.y,8,f); SFX.head(); return bigKill(z,f,{vx:f*260,vy:-120,noHead:true,spin:3}); }},
+  {n:"magdump",big:1,boss:1,ht:.94,dur:1.6,dd:44,vz:[[.3,"back"]],
+    fr:[[.22,AIMMID],[.78,{...CHAMB,T:8}],[.94,{nTH:94,nSH:-2,T:-12,fTH:-14,fSH:-4,hipX:5,snap:1}],[1.15,{nTH:80,nSH:-26,T:-6}],[1.4,{}]],
+    pre:[.3,.38,.46,.54,.62,.7].map(t=>[t,(F,z,f)=>{ shotAt(z,f,0); G.p.kick=4; G.side=G.side?0:1; }]),
+    hit:(F,z,f)=>{ const a=zc(z); blood(a.x+f*14,a.y,34,f,2.3); gibs(a.x,a.y,12,f); boneFx(a.x,a.y,10,f); SFX.thunk(); SFX.boom(); return bigKill(z,f,{vx:f*(z.boss?260:820),vy:-240,spin:2.2,at:0}); }} ];
+// ---- cars are not boxes. every prop has a measured top edge (hood, windshield, roof, trunk) and things stand on that, not on an invisible lid
+const PROF={};
+function platProf(type){ if(type in PROF)return PROF[type]; const im=IMG[type]; if(!im||!im.width)return null; let pr=null;
+  try{ const N=64, Hh=64, c=mkCv(N,Hh), x=c.getContext("2d"); x.drawImage(im,0,0,N,Hh); const d=x.getImageData(0,0,N,Hh).data, raw=new Array(N).fill(1);
+    for(let i=0;i<N;i++){ for(let j=0;j<Hh;j++){ if(d[(j*N+i)*4+3]>110){ raw[i]=j/Hh; break; } } }
+    pr=new Array(N); for(let i=0;i<N;i++){ let m=1; for(let k=-2;k<=2;k++){ const v=raw[Math.max(0,Math.min(N-1,i+k))]; if(v<m)m=v; } pr[i]=m; }      // a boot is wider than a pixel: stand on the highest thing under it
+    for(let pass=0;pass<2;pass++){ for(let i=1;i<N;i++)if(pr[i]>pr[i-1]+.07)pr[i]=pr[i-1]+.07; for(let i=N-2;i>=0;i--)if(pr[i]>pr[i+1]+.07)pr[i]=pr[i+1]+.07; }      // no step is a cliff: he can walk hood to roof
+  }catch(e){ pr=null; }
+  return PROF[type]=pr; }
+function platTop(pl,wx){ if(pl.type==="ground")return pl.y; const pr=platProf(pl.type); let y=pl.y; const u=Math.max(0,Math.min(.999,(wx-pl.x)/pl.w)); if(pr)y+=pl.h*pr[Math.floor(u*pr.length)];
+  if(pl.push){ const v=pl.v, tilt=(bhash((pl.x0||pl.x)*1.3)-.5)*.13+(v?v.rock:0); y+=(wx-(pl.x+pl.w/2))*Math.sin(tilt)+(v?Math.max(-10,v.bob*.06)+(v.dead?4:0):0); } return y; }
 function attack(){ const p=G.p; if(p.gunCd>0)return; if(G.flameT>0){ flame(); return; }
   if(p.atkT>0&&(p.atkType==="throw"||p.atkType==="exec"))return;
   if(p.reload>0&&G.ammo===Infinity)return; if(G.swap)return; shoot(); }
@@ -1369,7 +1823,7 @@ function endMutation(){ const p=G.p, bc=G.bigCat, x=G.morph.x; G.morph=null; p.v
   for(let i=0;i<26;i++){ const a=Math.random()*6.28, sp=160+Math.random()*380; part("s",x,GROUND-50,Math.cos(a)*sp,Math.sin(a)*sp*.6-90,.3+Math.random()*.4,i%3?"#ffcf6b":"#fff2c8",2+Math.random()*3); }
   for(let i=0;i<10;i++)part("m",x+(Math.random()-.5)*160,GROUND-4,(Math.random()-.5)*220,-20-Math.random()*40,.7+Math.random()*.5,"#8a8f99",9+Math.random()*10);
   G.lights.push({x,y:GROUND-70,r:330,life:.35,max:.35,col:"255,207,107"}); banner("IT FEEDS","ten seconds. C to pounce.",GOLD); }
-function catAttack(){ const p=G.p; if(MODE!=="play"||G.won||G.dead||G.perk||G.clearT>0||G.morph||G.intro)return; G.usedCat=true;
+function catAttack(){ const p=G.p; if(MODE!=="play"||G.won||G.dead||G.perk||G.clearT>0||G.morph||G.intro||G.stealth||G.chaos)return; G.usedCat=true;
   if(p.vicious>0){ const bc=G.bigCat; if(bc.pounceT>0||(bc.pcd||0)>0)return;                                     // mutated: C is a crowd-killing pounce
     let best=null,bd=1e9; for(const z of G.zombies){ if(z.dead)continue; const d=Math.abs((z.x+z.w/2)-(p.x+p.w/2)); if(d<700&&d<bd){bd=d;best=z;} }
     if(!best)best={x:p.x+p.w/2+220*p.mface}; bc.pounceT=.5; bc.pcd=1.8; bc.target=best; SFX.roar(); G.shake=Math.max(G.shake,8); return; }
@@ -1377,67 +1831,90 @@ function catAttack(){ const p=G.p; if(MODE!=="play"||G.won||G.dead||G.perk||G.cl
   const c=G.cats[0]; if(c.atkT>0||c.cd>0)return;
   let best=null,bd=1e9; for(const z of G.zombies){ if(z.dead)continue; const d=Math.abs((z.x+z.w/2)-(p.x+p.w/2)); if(d<620&&d<bd){bd=d;best=z;} }
   if(!best)return; c.atkT=.9; c.cdMax=(G.hordeWarned?2:4)*G.mod.cat; c.cd=c.cdMax; c.target=best; SFX.cat(); }
-// ---- the death scene: he goes down, they pile on, feed, and pull him apart. about four seconds, then the card
-function startDeath(){ const p=G.p, px=p.x+p.w/2, dir=-(p.face||1); let im=IMG.op;
-  try{ if(OPC.width>8){ im=mkCv(OPC.width,OPC.height); im.getContext("2d").drawImage(OPC,0,0); } }catch(e){}
-  const c={end:1.5,im,x:px,h:p.h,w:p.w,face:p.face,dir,vx:dir*90,t:0,head:false,hero:true}; G.corpses.push(c);
-  G.death={c,x:px,hb:0,bite:.5,rips:0,lens:[],head:null,freeze:0,parts:["fa","sh","ua","th"]};
+// ---- the death: he goes down. they come for him one at a time and pull him apart, a limb each, and eat. shot like a film: a push in, close-ups on every tear, a dutch angle on the pile, a slow pull out to black.
+const DROLES=[{k:"nArm",rip:1.55},{k:"fLeg",rip:2.55},{k:"fArm",rip:3.25},{k:"head",rip:4.45},{k:"eat",rip:99}], DCARD=6.2, DCARD_ALONE=2.2;
+function startDeath(){ const p=G.p, px=p.x+p.w/2, dir=-(p.face||1); for(const z of G.zombies){ if(z.dead)continue; z.emT=0; z.spinA=0; z.onCar=false; z.climbT=0; if(z.fly&&!z.thrown){ z.fly=false; z.y=GROUND-z.h; } } p.roll=null; p.kneel=0;
+  const proxy={x:p.x,y:p.y,w:p.w,h:p.h,face:p.face,dz:0,tier:0,_q:p._q}; G.killPow={vx:dir*110,vy:-170,spin:1.1}; const rg=makeRag(proxy,dir,"melee","op"); G.killPow=null; if(rg)rg.w=[.18,.2,.3,1,1,1,1,1,.7,1,.7,1];
+  let c; if(rg){ c={rag:rg,x:rg.pts[0].x,h:p.h,w:p.w,face:p.face,dir,t:0,hero:true}; }
+  else { let im=IMG.op; try{ if(OPC.width>8){ im=mkCv(OPC.width,OPC.height); im.getContext("2d").drawImage(OPC,0,0); } }catch(e){} c={end:1.5,im,x:px,h:p.h,w:p.w,face:p.face,dir,vx:dir*90,t:0,head:false,hero:true}; }
+  G.corpses.push(c);
+  const g=GUNS[gunKey()]||GUNS.pistol; for(let i=0;i<(g.dual?2:1);i++)toss({k:"gun",g:GUNS[gunKey()]?gunKey():"pistol",L:g.L*1.02,x:px+(i?-8:8),y:p.y+p.h*.4,vx:(i?-1:1)*(120+Math.random()*80),vy:-260,rot:0,vr:(i?-1:1)*10,life:30,gz:i*4});
+  G.death={c,x:px,hb:0,lens:[],roles:{},freeze:0,shot:null};
   if(p.vicious>0){ const bc=G.bigCat; if(bc&&bc.act)catActEnd(bc); if(bc&&G.cats[0])G.cats[0].x=bc.x; p.vicious=0; G.morphOut=.55; } G.morph=null;
-  for(const z of G.zombies){ z.atkPh=0; z.kv=0; z.stagger=0; } }
-function deathScene(dt){ const D=G.death; if(!D)return; const e=G.endT, c=D.c;
+  for(const z of G.zombies){ z.atkPh=0; z.kv=0; z.stagger=0; z.dRole=null; z.dCrowd=false; } }
+function deathTS(e){ let ts=e<.9?.4:.62; for(const r of DROLES){ const d=Math.abs(e-r.rip); if(d<.28)ts=Math.min(ts,.2+d); } return ts; }
+function zMouth(z){ const J=rigPts(z,"z"+z.tier,z._q||zParams(z)), n=J.pts[2], h=J.pts[3]; return {x:n.x+(h.x-n.x)*.7+z.face*3,y:n.y+(h.y-n.y)*.6,hx:(J.pts[5].x+J.pts[7].x)/2,hy:(J.pts[5].y+J.pts[7].y)/2,top:h.y}; }
+function deathScene(dt){ const D=G.death; if(!D)return; const e=G.endT, c=D.c, R=c.rag;
   if(D.freeze>0){ D.freeze-=dt; return; }
-  const ts=e<.7?.35:(e>3.7&&e<4.5)?.3:1, d2=dt*ts; G.t+=d2; ambient(d2); fxUpdate(d2);
-  const bx=D.x=c.x+c.dir*c.h*.46;
-  setZoom(ZOOM+(1.5-ZOOM)*Math.min(1,dt*.7)); { const tc=Math.max(0,Math.min(LEVEL.w-VW,bx-VW/2)); G.camX+=(tc-G.camX)*Math.min(1,dt*2.2); }
-  const SL=[-30,26,-8,46,-52,8], zs=G.zombies.filter(z=>!z.dead&&!z.boss&&!(z.emT>0)&&!z.fly&&!z.thrown).sort((a,b)=>Math.abs(a.x-bx)-Math.abs(b.x-bx)); let feeders=[];
-  zs.forEach((z,i)=>{ const side=(z.x+z.w/2)<bx?-1:1, tx=i<SL.length?bx+SL[i]:bx+side*(74+(i-SL.length)*22), zx=z.x+z.w/2, d=tx-zx; z.y=GROUND-z.h;
-    if(z.rip){ z.rip.t+=d2; z.feed=false; z.face=zx<bx?1:-1; if(z.rip.t>1.5){ z.rip=null; } if(Math.random()<d2*14)part("g",zx+z.face*z.w*.5,z.y+z.h*.32,(Math.random()-.5)*40,20+Math.random()*60,.5,"#8a0d10",2+Math.random()*2); return; }
-    if(Math.abs(d)>7&&e>.25){ z.feed=false; z.face=d>0?1:-1; z.x+=z.face*Math.max(z.spd,150)*d2; z.walk+=d2*9; }
-    else if(e>.25){ z.face=zx<bx?1:-1; if(i<SL.length&&c.t>.4){ z.feed=true; feeders.push(z); } } });
-  { const HB=[.2,.95,1.9,3.05]; if(D.hb<HB.length&&e>=HB[D.hb]){ SFX.heart(1-.2*D.hb); D.hb++; } }      // his heart, slowing
-  if(feeders.length)D.fed=true; if(!D.fed&&e>1.3)D.alone=true; if(G.morphOut>0)G.morphOut-=d2;
-  for(const z of G.zombies){ if(z.dead)continue; if(z.thrown)thrownUpdate(z,d2); else if(z.boss){ const d=bx-(z.x+z.w/2); z.state="walk"; z.face=d>0?1:-1; if(Math.abs(d)>z.w*.7){ z.x+=z.face*z.spd*.5*d2; z.walk+=d2*4; } } }
-  D.bite-=d2;
-  if(feeders.length&&D.bite<=0){ D.bite=.11+Math.random()*.12; const z=feeders[Math.floor(Math.random()*feeders.length)], hx=bx+(Math.random()-.5)*52;
-    blood(hx,GROUND-10,4+Math.floor(Math.random()*4),-z.face,.9); if(Math.random()<.4)gibs(hx,GROUND-12,2,-z.face); if(Math.random()<.6)decal(bx+(Math.random()-.5)*90,14+Math.random()*24);
-    G.shake=Math.max(G.shake,3.5); if(Math.random()<.6)SFX.flesh(); if(Math.random()<.12)SFX.groan(); }
-  const RT=[1.45,2.15,2.85];
-  if(D.rips<RT.length&&e>=RT[D.rips]&&feeders.length){ const z=feeders[D.rips%feeders.length], R=HR.rigs.op, pt=D.parts[D.rips], im=R&&R.img&&R.img[pt]; D.rips++;
-    z.feed=false; z.rip={im:(im&&im.width)?im:null,t:0}; const hx=z.x+z.w/2;
-    blood(bx,GROUND-16,26,0,1.5); gibs(bx,GROUND-16,7,z.face); decal(bx,34+Math.random()*20); G.shake=Math.max(G.shake,13); D.freeze=.07; SFX.kill(); SFX.flesh();
-    for(let i=0;i<2;i++)D.lens.push({x:W*(Math.random()<.5?.04+Math.random()*.22:.74+Math.random()*.22),y:H*(.14+Math.random()*.6),r:5+Math.random()*13,t:0,s:Math.random()*6.28}); }
-  if(!D.head&&D.fed&&e>=3.7){ D.head={x:bx-c.dir*c.h*.42,y:GROUND-18,vx:-c.dir*46,vy:-470,rot:0}; blood(D.head.x,GROUND-16,34,0,1.7); gibs(D.head.x,GROUND-16,8,0); G.shake=Math.max(G.shake,16); D.freeze=.09; SFX.head(); SFX.kill();
-    for(let i=0;i<4;i++)D.lens.push({x:W*(.06+Math.random()*.88),y:H*(.12+Math.random()*.5),r:8+Math.random()*20,t:0,s:Math.random()*6.28}); }
-  if(D.head){ const h=D.head; h.vy+=900*d2; h.x+=h.vx*d2; h.y+=h.vy*d2; h.rot+=d2*9; if(h.y>GROUND-8){ h.y=GROUND-8; h.vy*=-.3; h.vx*=.5; if(Math.abs(h.vy)<40)h.vy=0; }
-    if(h.vy!==0&&Math.random()<d2*40)part("g",h.x,h.y,(Math.random()-.5)*60,Math.random()*60,.5,"#9a0f12",2+Math.random()*2); }
-  for(const L of D.lens)L.t+=dt; }
-function drawRip(z,cx){ const r=z.rip, up=Math.min(1,r.t/.25), x=cx+z.face*z.w*.42, y=z.y+z.h*(.5-.24*up), a=z.face*(.5+Math.sin(G.t*17)*.35*(r.t>.3?1:0));
-  ctx.save(); ctx.translate(x,y+Math.sin(G.t*22)*1.5); ctx.rotate(a);
-  if(r.im){ const s=34/Math.max(r.im.width,r.im.height); ctx.drawImage(r.im,-r.im.width*s/2,-r.im.height*s/2,r.im.width*s,r.im.height*s); }
-  else { ctx.fillStyle="#2a2c33"; ctx.fillRect(-4,-16,8,32); }
-  ctx.fillStyle="#b01216"; ctx.beginPath(); ctx.arc(0,-15,5,0,6.28); ctx.fill(); ctx.restore();
-  if(r.t<.3&&G.death){ ctx.strokeStyle="rgba(170,16,20,.85)"; ctx.lineWidth=2.2*(1-r.t/.3)+.6; ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo((x+G.death.x)/2,GROUND-34,G.death.x,GROUND-12); ctx.stroke(); } }      // what was still attached
-function drawDeathFx(){ const D=G.death; if(!D)return; const e=G.endT;
-  if(D.head){ const h=D.head, R=HR.rigs.op, im=R&&R.img&&R.img.head, sx=ZOOM*(h.x-G.camX), sy=GROUND+ZOOM*(h.y-GROUND); ctx.save(); ctx.translate(sx,sy); ctx.rotate(h.rot);
-    if(im&&im.width){ const s=22*ZOOM/Math.max(im.width,im.height); ctx.drawImage(im,-im.width*s/2,-im.height*s/2,im.width*s,im.height*s); } else { ctx.fillStyle="#2a2c33"; ctx.beginPath(); ctx.arc(0,0,9*ZOOM,0,6.28); ctx.fill(); }
-    ctx.fillStyle="#a01014"; ctx.beginPath(); ctx.arc(0,9*ZOOM,4.5*ZOOM,0,6.28); ctx.fill(); ctx.restore(); }
-  const pulse=.5+.5*Math.sin(e*5.2), vg=ctx.createRadialGradient(W/2,H*.62,H*.2,W/2,H*.62,H*.9); vg.addColorStop(0,"rgba(60,0,0,0)"); vg.addColorStop(1,`rgba(70,0,2,${Math.min(.62,e*.3)*(.75+.25*pulse)})`); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-  for(const L of D.lens){ const k=Math.min(1,L.t/.12), dr=Math.min(60,L.t*14); ctx.fillStyle="rgba(150,8,12,.86)"; ctx.beginPath(); ctx.ellipse(L.x,L.y,L.r*k,L.r*k*.82,L.s,0,6.28); ctx.fill();
-    for(let i=0;i<3;i++){ const a=L.s+i*2.1; ctx.beginPath(); ctx.arc(L.x+Math.cos(a)*L.r*1.25*k,L.y+Math.sin(a)*L.r*1.1*k,L.r*.2,0,6.28); ctx.fill(); }
-    ctx.fillRect(L.x-L.r*.12,L.y,L.r*.24,dr+L.r*.5); ctx.beginPath(); ctx.arc(L.x,L.y+dr+L.r*.5,L.r*.15,0,6.28); ctx.fill();                       // it runs down the glass
-    ctx.fillStyle="rgba(255,120,120,.20)"; ctx.beginPath(); ctx.ellipse(L.x-L.r*.3*k,L.y-L.r*.3*k,L.r*.26*k,L.r*.14*k,L.s,0,6.28); ctx.fill(); }
-  const bar=H*.105*Math.min(1,e/.5)*Math.min(1,e/.5); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar); }      // letterbox closes in
-function hurtPlayer(dmg){ if(G.invuln>0||G.dead)return false; G.hp-=(dmg||1); if(G.arena)G.arena.hit=true; G.invuln=1.3; G.hurtFlash=.6; SFX.hurt(); if(TOUCHMODE&&navigator.vibrate)try{ navigator.vibrate(G.hp<=1?[60,40,90]:45); }catch(e){} G.shake=Math.max(G.shake,12); G.combo=0; G.comboT=0;
+  const ts=deathTS(e), d2=dt*ts; TSC=ts; G.t+=d2; ambient(d2); fxUpdate(d2); if(G.morphOut>0)G.morphOut-=d2;
+  const bx=D.x=R?R.pts[0].x:c.x+c.dir*c.h*.46;
+  setZoom(ZOOM+(1.25-ZOOM)*Math.min(1,dt*2)); { const tc=Math.max(0,Math.min(LEVEL.w-VW,bx-VW/2)); G.camX+=(tc-G.camX)*Math.min(1,dt*3); }
+  { const HB=[.2,.9,1.8,2.9,4.1]; if(D.hb<HB.length&&e>=HB[D.hb]){ SFX.heart(1-.17*D.hb); D.hb++; } }      // his heart, slowing
+  // cast the scene: the nearest five each get a job
+  const live=G.zombies.filter(z=>!z.dead&&!z.boss&&!(z.emT>0)&&!z.fly&&!z.thrown).sort((a,b)=>Math.abs(a.x+a.w/2-bx)-Math.abs(b.x+b.w/2-bx));
+  if(R&&e>.15){ for(const z of live){ if(z.dRole||z.dCrowd)continue; const free=DROLES.find(r=>!D.roles[r.k]&&(r.rip>e+.5||r.k==="eat")); if(free&&Math.abs(z.x+z.w/2-bx)<700){ D.roles[free.k]=z; z.dRole={k:free.k,st:"walk",t:0,rip:free.rip,bite:.3}; } else if(Math.abs(z.x+z.w/2-bx)<380)z.dCrowd=true; } }
+  if(Object.keys(D.roles).length)D.fed=true; if(!D.fed&&e>1.3)D.alone=true;
+  if(R)R.pins=[];
+  const crowd=[-230,250,-330,350,-420,440]; let ci=0;
+  for(const z of G.zombies){ if(z.dead)continue; if(z.thrown){ thrownUpdate(z,d2); continue; }
+    if(z.boss){ const d=bx-(z.x+z.w/2); z.state="walk"; z.face=d>0?1:-1; if(Math.abs(d)>z.w*.7){ z.x+=z.face*z.spd*.5*d2; z.walk+=d2*4; } continue; }
+    z.y=GROUND-z.h; const zx=z.x+z.w/2, r=z.dRole;
+    if(r&&R){ r.t+=d2; const P=R.pts, hs=(P[3].x>=P[0].x)?1:-1, gp=r.k==="eat"?P[1]:P[RIPS[r.k].grab];
+      const spot=r.k==="nArm"?bx+hs*34:r.k==="fArm"?bx-hs*6:r.k==="fLeg"?bx-hs*84:r.k==="head"?bx+hs*96:P[1].x; z.dz=r.k==="fLeg"||r.k==="head"?-6:-13;
+      if(r.st==="eat"&&r.t<1.2)z.x+=(r.k==="head"?hs:r.k==="fLeg"?-hs:(r.k==="nArm"?1:-1)*hs)*d2*46;      // backs off with its prize
+      if(r.st==="walk"){ if(r.k==="eat"&&e<4.8)continue; const tx=spot, d=tx-zx; z.face=d>0?1:-1; if(Math.abs(d)>5&&e>.2){ z.x+=Math.sign(d)*Math.min(Math.abs(d),Math.max(z.spd,170)*d2); z.walk+=d2*9; } else if(e>.2){ r.st=r.k==="eat"?"gnaw":"tug"; r.t=0; } }
+      else { z.face=(bx>zx)?1:-1; }
+      if(r.st==="tug"){ const m=zMouth(z), pull=Math.min(1,r.t/.5)*16; R.pins.push({i:RIPS[r.k].grab,x:m.hx-z.face*pull*.4,y:m.hy,k:.3}); z.x-=z.face*d2*6;
+        if(Math.random()<d2*4){ SFX.flesh(); blood(gp.x,gp.y,1,-z.face,.4); }
+        if(e>=r.rip&&r.t>.35){ const gi=ragRip(c,r.k); if(gi!=null){ r.held=gi; r.st="lift"; r.t=0; const s=R.pts[RIPS[r.k].from];
+            blood(s.x,s.y,12,-z.face,1.5); gibs(s.x,s.y,3,-z.face); boneFx(s.x,s.y,5,-z.face); decal(s.x,34+Math.random()*16); G.shake=Math.max(G.shake,13); D.freeze=.11; SFX.crack(); SFX.flesh(); SFX.kill(); if(r.k==="head")SFX.head();
+            for(let i=0;i<2;i++)D.lens.push({x:W*(Math.random()<.5?.05+Math.random()*.2:.75+Math.random()*.2),y:H*(.15+Math.random()*.55),r:6+Math.random()*12,t:0,s:Math.random()*6.28}); } } }
+      else if(r.st==="lift"){ const m=zMouth(z); R.pins.push({i:r.held,x:m.hx,y:m.hy,k:.5}); if(r.t>(r.k==="head"?.9:.7)){ r.st="eat"; r.t=0; SFX.groan(); } }
+      else if(r.st==="eat"){ const m=zMouth(z); R.pins.push({i:r.held,x:m.x+Math.sin(r.t*21)*2.5,y:m.y+Math.sin(r.t*13)*2,k:.6}); r.bite-=d2; if(r.bite<=0){ r.bite=.22+Math.random()*.2; blood(m.x,m.y,2,z.face,.6); if(Math.random()<.5)SFX.flesh(); if(Math.random()<.3)part("c",m.x,m.y,z.face*60,-80,.6,"#e8dcc4",1.4); } }
+      else if(r.st==="gnaw"){ r.bite-=d2; if(r.bite<=0){ r.bite=.18+Math.random()*.2; const p1=R.pts[1]; blood(p1.x,p1.y-4,2,-z.face,.7); decal(p1.x,14+Math.random()*20); G.shake=Math.max(G.shake,2.5); if(Math.random()<.5)SFX.flesh(); } } }
+    else if(z.dCrowd){ const tx=bx+crowd[ci%crowd.length]*(1+Math.floor(ci/crowd.length)*.4), d=tx-zx; ci++; z.dz=-16-(ci%3)*3; if(Math.abs(d)>6){ z.face=d>0?1:-1; z.x+=Math.sign(d)*Math.min(Math.abs(d),Math.max(z.spd,140)*d2); z.walk+=d2*8; } else { z.face=bx>zx?1:-1; z.walk+=d2*1.2; } z.dSit=e>4.9; } }
+  for(const L of D.lens)L.t+=dt;
+  { const ct=G.cats&&G.cats[0]; if(ct&&!ct.atkT){ const away=ct.x<bx?-1:1, pv=ct.x; if(Math.abs(ct.x-bx)<520){ ct.x+=away*260*d2; ct.face=away; } ct.y=GROUND; ct.spd=Math.abs(ct.x-pv)/Math.max(1e-4,d2); ct.gait=(ct.gait||0)+ct.spd*d2*.062; } }      // the cat runs for it
+  D.shot=deathShot(e,bx); }
+function deathShot(e,bx){ const D=G.death, R=D.c.rag, ro=D.roles, P=R?R.pts:null, at=z=>z&&!z.dead?{x:z.x+z.w/2,y:z.y+z.h*.55}:null, body={x:bx,y:GROUND-24};
+  const ease=u=>{ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); };
+  if(D.alone)return {c:1.2+.25*ease(e/2),r:0,f:body};
+  if(e<1.15)return {c:1.15+.3*ease(e/1.15),r:0,f:body};
+  if(e<2.15){ const z=ro.nArm, f=z?{x:(z.x+z.w/2+(P?P[5].x:bx))/2,y:GROUND-40}:body; return {c:2.25+.15*ease((e-1.15)),r:-.035,f}; }
+  if(e<3.0)return {c:1.65,r:-.12,f:{x:bx,y:GROUND-14}};
+  if(e<3.95){ const z=ro.nArm, f=z?{x:z.x+z.w/2,y:GROUND-z.h*.55}:body; return {c:2.6,r:.05,f}; }
+  if(e<5.0){ const z=ro.head, f=z?{x:(z.x+z.w/2+(P?P[3].x:bx))/2,y:GROUND-z.h*.5}:body; return {c:2.2+.2*ease(e-3.95),r:0,f}; }
+  return {c:1.6-.6*ease((e-5)/1.3),r:0,f:body}; }
+function deathZ(z,q){ const r=z.dRole, t=G.t+z.x*.01, crouch=(k)=>{ q.nTH=10+66*k; q.nSH=-(14+116*k); q.fTH=-6+62*k; q.fSH=-(10+108*k); q.lift=0; };
+  if(r&&r.st==="walk")return q;
+  if(r&&r.st==="tug"){ const jerk=((t*2.4)%1)<.18; crouch(.9); q.T=jerk?38:56; q.H=jerk?-16:10; q.nUA=jerk?6:-22; q.nFA=jerk?40:26; q.fUA=jerk?-4:-30; q.fFA=jerk?44:30; if(jerk)q.snap=1; return q; }      // down on him, hands in, yanking
+  if(r&&r.st==="lift"){ const u=Math.min(1,r.t/.35); crouch(.9*(1-u)); q.T=56*(1-u)-10*u; q.H=-24*u; q.nUA=-22+(176)*u; q.nFA=26-30*u; q.fUA=-30+170*u; q.fFA=30-34*u; return q; }      // stands up with it, overhead
+  if(r&&r.st==="eat"){ crouch(.25); q.T=18+3*Math.sin(t*9); q.H=-14+10*Math.sin(t*13); q.nUA=52; q.nFA=104+6*Math.sin(t*13); q.fUA=44; q.fFA=112; return q; }      // hunched, gnawing on what it tore off
+  if((r&&r.st==="gnaw")||(z.dCrowd&&z.dSit)){ const yank=((t*.77)%1)<.13; crouch(1); q.T=yank?42:62+5*Math.sin(t*5.2); q.H=yank?-12:22+15*Math.sin(t*9.4); q.nUA=yank?-8:-34+12*Math.sin(t*8.6); q.nFA=yank?86:44+18*Math.sin(t*8.6+1); q.fUA=yank?-16:-40+12*Math.sin(t*7.9+2); q.fFA=yank?80:50+16*Math.sin(t*7.9+2.6); if(yank)q.snap=1; return q; }
+  return q; }
+function drawDeathFx(){ const D=G.death; if(!D)return; const e=G.endT, sh=D.shot, cw=canvas.width, ch=canvas.height, k=cw/W;
+  if(sh&&(sh.c>1.001||Math.abs(sh.r)>.001)){ if(!FINC)FINC=document.createElement("canvas"); if(FINC.width!==cw||FINC.height!==ch){ FINC.width=cw; FINC.height=ch; } const fx=FINC.getContext("2d"); fx.setTransform(1,0,0,1,0,0); fx.clearRect(0,0,cw,ch); fx.drawImage(canvas,0,0);
+    const px=ZOOM*(sh.f.x-G.camX)*k, py=(GROUND+ZOOM*(sh.f.y-GROUND))*k, sc=Math.max(sh.c,1+Math.abs(sh.r)*1.2);
+    ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle="#040509"; ctx.fillRect(0,0,cw,ch); ctx.translate(cw/2,ch*.55); ctx.rotate(sh.r); ctx.scale(sc,sc); ctx.translate(-px,-py); ctx.drawImage(FINC,0,0); ctx.restore(); ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0); }
+  const pulse=.5+.5*Math.sin(e*5.2), vg=ctx.createRadialGradient(W/2,H*.58,H*.2,W/2,H*.58,H*.9); vg.addColorStop(0,"rgba(40,0,0,0)"); vg.addColorStop(1,`rgba(30,0,2,${Math.min(.7,.25+e*.12)*(.8+.2*pulse)})`); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  for(const L of D.lens){ const kk=Math.min(1,L.t/.12), dr=Math.min(60,L.t*14); ctx.fillStyle="rgba(150,8,12,.86)"; ctx.beginPath(); ctx.ellipse(L.x,L.y,L.r*kk,L.r*kk*.82,L.s,0,6.28); ctx.fill();
+    for(let i=0;i<3;i++){ const a=L.s+i*2.1; ctx.beginPath(); ctx.arc(L.x+Math.cos(a)*L.r*1.25*kk,L.y+Math.sin(a)*L.r*1.1*kk,L.r*.2,0,6.28); ctx.fill(); }
+    ctx.fillRect(L.x-L.r*.12,L.y,L.r*.24,dr+L.r*.5); ctx.beginPath(); ctx.arc(L.x,L.y+dr+L.r*.5,L.r*.15,0,6.28); ctx.fill(); }      // it runs down the glass
+  if(D.freeze>0){ ctx.fillStyle=`rgba(255,240,235,${D.freeze*.8})`; ctx.fillRect(0,0,W,H); }
+  const cardAt=D.alone?DCARD_ALONE:DCARD, dark=Math.max(0,Math.min(1,(e-(cardAt-.9))/.9)); if(dark>0){ ctx.fillStyle=`rgba(0,0,0,${dark*.75})`; ctx.fillRect(0,0,W,H); }
+  const bar=H*.11*Math.min(1,e/.5)*Math.min(1,e/.5); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bar); ctx.fillRect(0,H-bar,W,bar); }      // letterbox closes in
+function hurtPlayer(dmg){ if(G.invuln>0||G.dead||G.fin||G.p.roll||G.chaos)return false; G.hp-=(dmg||1); if(G.arena)G.arena.hit=true; G.invuln=1.3; G.hurtFlash=.6; SFX.hurt(); if(TOUCHMODE&&navigator.vibrate)try{ navigator.vibrate(G.hp<=1?[60,40,90]:45); }catch(e){} G.shake=Math.max(G.shake,12); G.combo=0; G.comboT=0;
   blood(G.p.x+G.p.w/2,G.p.y+30,10,0,.8);
   if(G.hp<=0){ G.dead=true; G.endT=0; G.slow=1.2; gibs(G.p.x+G.p.w/2,G.p.y+40,10,0); blood(G.p.x+G.p.w/2,G.p.y+40,30,0,1.2); saveBest(); startDeath(); } return true; }
 function saveBest(){ if(G.score>BEST){ BEST=G.score; G.newBest=true; try{ localStorage.setItem("softstep_best",BEST); }catch(e){} } }
 // how: shot | crit | gib | melee | stomp | cat | boom
-function killZombie(z,score,how,dir){ if(z.dead)return; z.dead=true; G.kills++; G.xp++;
+function killZombie(z,score,how,dir){ if(z.dead||(z.finLock&&!G.finKill))return; z.dead=true; G.kills++; G.xp++; if(!G.fin)G.finK=(G.finK||0)+1;
   if(G.flameT<=0){ G.flameK+=Math.abs((z.x+z.w/2)-(G.p.x+G.p.w/2))<140?2:1; if(G.flameK>=FLAME_NEED)unlockFlame(); }
   G.combo++; G.comboT=2.4; if(G.combo>G.bestCombo)G.bestCombo=G.combo;
   const lazy=G.camp>10&&!G.arena&&!G.bossSpawned, base=score||TIER[z.tier].sc, gain=Math.round(base*(1+Math.min(2,G.combo*.08))*(lazy?.2:1)); G.score+=gain; if(lazy)G.xp--;
   if(G.p.vicious<=0&&!G.morph) G.mut=Math.min(1,(G.mut||0)+(how==="cat"?.03:.015)*(G.hordeWarned?1.3:1));     // every kill feeds the cat; its own kills feed it twice as fast
   const cx=z.x+z.w/2, cy=z.y+z.h*.45; dir=dir||(cx<G.p.x+G.p.w/2?-1:1); how=how||"shot";
+  if(how==="fire"&&Math.random()<.6){ const rg=makeRag(z,dir,"shot"); if(rg){ rg.char=true; if(G.corpses.length>34)G.corpses.shift(); G.corpses.push({rag:rg,x:rg.pts[0].x,h:z.h,w:z.w,face:z.face,dir,t:0,head:false}); SFX.sizzle(); fireAt(cx,1.8); G.lights.push({x:cx,y:cy,r:110,life:.2,max:.2,col:"255,140,50"}); return; } }
   if(how==="fire"){ const fr=zSnap(z); if(fr)G.ashes.push({im:fr,x:cx,by:z.y+z.h,h:z.h,w:z.w,face:z.face,t:0}); SFX.sizzle(); G.scorches.length<60&&Math.random()<.3&&G.scorches.push(cx);
     G.lights.push({x:cx,y:cy,r:110,life:.2,max:.2,col:"255,140,50"}); return; }
   if(how==="crit")G.hitStop=Math.max(G.hitStop,.045); else if(how==="gib")G.hitStop=Math.max(G.hitStop,.025);
@@ -1445,20 +1922,21 @@ function killZombie(z,score,how,dir){ if(z.dead)return; z.dead=true; G.kills++; 
   else SFX.kill();
   const pulp=(how==="gib"||how==="boom"||how==="cat"||how==="stomp"||how==="pop")||(how==="shot"&&Math.random()<.3);
   if(pulp){ gibs(cx,cy,how==="boom"?7:5,dir); blood(cx,cy,how==="boom"?18:14,dir,1.1); decal(cx,10+Math.random()*14); }
-  else { blood(cx,cy,9,dir); const fr=zSnap(z); if(fr){ if(G.corpses.length>34)G.corpses.shift(); G.corpses.push({end:1.5+(Math.random()-.5)*.24,im:fr,x:cx,h:z.h,w:z.w,face:z.face,dir:(how!=="melee"&&Math.random()<.3)?-dir:dir,vx:dir*(how==="melee"?260:120),t:0,head:how==="crit"}); } }
+  else { blood(cx,cy,9,dir); const rg=makeRag(z,dir,how); if(rg){ if(G.corpses.length>34)G.corpses.shift(); G.corpses.push({rag:rg,x:rg.pts[0].x,h:z.h,w:z.w,face:z.face,dir,t:0,head:rg.noHead}); } else { const fr=zSnap(z); if(fr){ if(G.corpses.length>34)G.corpses.shift(); G.corpses.push({end:1.5+(Math.random()-.5)*.24,im:fr,x:cx,h:z.h,w:z.w,face:z.face,dir:(how!=="melee"&&Math.random()<.3)?-dir:dir,vx:dir*(how==="melee"?260:120),t:0,head:how==="crit"}); } } }
   G.lights.push({x:cx,y:cy,r:80,life:.1,max:.1,col:"255,120,70"});
   if(z.tier>1 && Math.random()<.3) G.picks.push({life:14,x:cx,t:(G.hp<G.maxhp&&Math.random()<.6)?"med":(Math.random()<.5?"shotgun":"smg"),got:false,drop:true});
   if(G.mod.pop>0 && how!=="pop" && Math.random()<G.mod.pop) G.pops.push({x:cx,y:cy,t:.08}); }
 function killBoss(z){ z.dead=true; G.bossDead=true; G.kills++; G.score+=2500; G.slow=1.4; G.hitStop=.14; G.shake=Math.max(G.shake,30); SFX.boom();
   for(let i=0;i<6;i++){ gibs(z.x+z.w/2+(Math.random()-.5)*z.w, z.y+z.h*(.25+Math.random()*.6), 6, 0); blood(z.x+z.w/2,z.y+z.h*.5,14,0,1.4); }
   decal(z.x+z.w/2,60); G.flash=1; banner(LEVEL.boss.name.replace("THE ","")+" DOWN",LV?"get on the train":"the doors are open",GOLD); }
-function damageZombie(z,dmg,how,dir){ if(z.dead)return; z.hp-=(z.boss&&z.state==="stun")?dmg*2:dmg; z.hitFlash=.1; z.hitT=.12; z.hitDir=dir||0; if(z.hp<=0){ z.boss?killBoss(z):killZombie(z,0,how,dir); } else { SFX.flesh(); blood(z.x+z.w/2,z.y+z.h*.4,3,dir||0,.7); } }
+function damageZombie(z,dmg,how,dir){ if(z.dead||(z.finLock&&!G.finKill))return; z.hp-=(z.boss&&z.state==="stun")?dmg*2:dmg; z.hitFlash=.1; z.hitT=.12; z.hitDir=dir||0; if(z.hp<=0){ if(z.boss&&bossFinOK(z)){ z.hp=1; startFin(z); } else z.boss?killBoss(z):killZombie(z,0,how,dir); } else { SFX.flesh(); blood(z.x+z.w/2,z.y+z.h*.4,3,dir||0,.7); } }
 function slay(z,score,bossDmg,how){ if(z.boss){ if(z.iT>0)return; z.iT=.3; damageZombie(z,Math.min(4,bossDmg),how); } else killZombie(z,score,how||"cat"); }
 function explodeAt(cx,cy,rad,how,big){ let n=0;
   for(const z of G.zombies){ if(z.dead)continue; if(Math.abs((z.x+z.w/2)-cx)<rad){ if(z.boss)damageZombie(z,big?12:3,how); else if(big&&z.tier<3&&!z.thrown&&!z.carried&&z.emT<=0)fling(z,(z.x+z.w/2)<cx?-1:1,200); else if(big||z.tier===1)killZombie(z,TIER[z.tier].sc,how,(z.x+z.w/2)<cx?-1:1); else damageZombie(z,5,how); n++; } }
   G.lights.push({x:cx,y:cy,r:big?300:150,life:big?.3:.16,max:big?.3:.16,col:"255,160,60"});
   for(let i=0;i<(big?26:10);i++){ const a=Math.random()*6.28,s=120+Math.random()*(big?420:240); part("s",cx,cy,Math.cos(a)*s,Math.sin(a)*s-80,.25+Math.random()*.35,i%3?"#ff9a3c":"#ffe08a",2+Math.random()*3); }
   for(let i=0;i<(big?8:3);i++)part("m",cx+(Math.random()-.5)*40,cy-10,(Math.random()-.5)*60,-40-Math.random()*60,1+Math.random()*.8,"#3a3838",14+Math.random()*16);
+  for(const c of G.corpses){ if(c.rag&&Math.abs(c.x-cx)<rad*1.3){ const d=c.x<cx?-1:1; ragPush(c,d*(big?620:320),-(big?420:220)); } }
   G.shake=Math.max(G.shake,big?22:9); return n; }
 function explodeBarrel(pl){ if(pl.boomed)return; pl.boomed=true; G.boomed=true;
   G.platforms=G.platforms.filter(q=>q!==pl); G.spots=G.spots.filter(s=>s.plat!==pl);
@@ -1475,7 +1953,7 @@ function spawnZombie(prog, bothSides){ const p=G.p;
   else if(G.arena){ sx=Math.random()<.5 ? G.arena.x1+50+Math.random()*180 : G.arena.x0-50-Math.random()*180; }
   else { let ahead=(bothSides?Math.random()<.5:Math.random()<.78)?1:-1; if(ahead<0&&G.camX<150)ahead=1; if(ahead>0&&G.camX+VW>LEVEL.w-150)ahead=-1; sx= ahead>0 ? G.camX+VW+60+Math.random()*200 : G.camX-60-Math.random()*120; }
   const h=T.h*sc, yB=(em&&em.elevated)?GROUND-em.elevated-h:GROUND-h, hp=tier===3?11:T.hp;
-  G.zombies.push({x:Math.max(0,Math.min(LEVEL.w,sx)),y:yB,w:h*.42,h,tier,hp,maxhp:hp,spd:zspd*(.9+Math.random()*.2),face:1,walk:Math.random()*6,dead:false,hitFlash:0,dz:Math.round(Math.random()*13-5),stagger:em?.7:0,emerge:!!em,emT:em?.7:0,emSpot:em,fly:!!(em&&em.elevated)}); }
+  G.zombies.push({x:Math.max(0,Math.min(LEVEL.w,em?sx-h*.21:sx)),y:yB,w:h*.42,h,tier,hp,maxhp:hp,spd:zspd*(.9+Math.random()*.2),face:1,walk:Math.random()*6,dead:false,hitFlash:0,dz:Math.round(Math.random()*13-5),stagger:em?.7:0,emerge:!!em,emT:em?.7:0,emSpot:em,fly:!!(em&&em.elevated)}); }
 function spawnBoss(){ G.bossSpawned=true; if(G.hp<G.maxhp)G.picks.push({x:G.p.x+90,t:"med",got:false}); const B=LEVEL.boss, HP=B.hp, h=210+LV*16, bx=Math.min(LEVEL.w-140,LEVEL.exit-240);
   G.zombies.push({boss:true,x:bx,y:GROUND-h,w:Math.round(h*.5),h,tier:3,hp:HP,maxhp:HP,spd:B.spd,chargeSpd:B.charge,face:-1,state:'walk',stateT:0,cd:2.0,walk:0,hitFlash:0,dead:false,stagger:0});
   G.shake=Math.max(G.shake,18); SFX.roar(); banner(LEVEL.boss.name,LEVEL.boss.sub,RED); }
@@ -1484,7 +1962,7 @@ function updateBoss(z,dt){ const p=G.p; z.cd-=dt; if(z.stateT>0)z.stateT-=dt;
   if(z.state==='charge'){ z.x+=z.cdir*z.chargeSpd*dt; if(z.stateT<=0||z.x<=G.camX+2||z.x+z.w>=G.camX+VW-2){ z.state='stun'; z.stateT=.9; G.shake=Math.max(G.shake,9); } }
   else if(z.state==='stun'){ if(z.stateT<=0)z.state='walk'; }
   else if(z.state==='wind'){ if(z.stateT<=0){ z.state='charge'; z.stateT=.6; z.cdir=z.face; G.shake=Math.max(G.shake,8); } }
-  else { z.face=dir; z.x+=dir*z.spd*dt; if(z.cd<=0 && adx<W*.55){ z.state='wind'; z.stateT=LV?.5:.6; z.cd=3.0; } }
+  else { if(adx>14){ z.face=dir; z.x+=dir*z.spd*dt; } if(z.cd<=0 && adx<W*.55){ z.state='wind'; z.stateT=LV?.5:.6; z.cd=3.0; } }
   z.x=Math.max(0,Math.min(LEVEL.w-z.w,z.x)); z.y=GROUND-z.h;
   const hb={x:z.x+z.w*.15,y:z.y+z.h*.36,w:z.w*.7,h:z.h*.64};
   if(z.state!=='stun' && overlap(p,hb)){ const charging=z.state==='charge', kd=charging?z.cdir:dir; if(hurtPlayer(1)){ p.vx=kd*(charging?440:300); p.vy=-260; G.shake=Math.max(G.shake,charging?16:10); } if(charging){ z.state='stun'; z.stateT=.9; } } }
@@ -1493,10 +1971,12 @@ function drawBoss(z){ ctx.save(); ctx.globalAlpha=0.34; ctx.fillStyle="#000"; ct
   const bob=Math.abs(Math.sin(z.walk*2))*8; ctx.save(); if(z.hitFlash>0)ctx.globalAlpha=.6; if(z.state==='wind'){ctx.shadowColor="#ff5a4d";ctx.shadowBlur=30;}
   const bx=z.x+z.w/2, bby=z.y+z.h-bob, wd=z.state==='wind', ch=z.state==='charge', brr=Math.sin(G.t*2)*.015;
   if(ch){ for(const gh of [[-54,.12],[-36,.2],[-18,.3]]){ ctx.save(); ctx.globalAlpha*=gh[1]; spr2(im,bx+z.face*gh[0],bby,z.h,z.face,z.face*.16,1.06,.97); ctx.restore(); } }
-  if(rigB)chr(im,bx,z.y+z.h,z.h,z.face,0,1,1,"z"); else chr(im,bx,bby,z.h,z.face,wd?-z.face*.12:ch?z.face*.16:0,wd?1.08:ch?1.06:1-brr*.6,wd?.90:ch?.97:1+brr,"z"); ctx.restore(); }
+  if(rigB)chr(im,bx,z.y+z.h+(z.liftY?-z.liftY:0),z.h,z.face,0,1,1,"zb"); else chr(im,bx,bby,z.h,z.face,wd?-z.face*.12:ch?z.face*.16:0,wd?1.08:ch?1.06:1-brr*.6,wd?.90:ch?.97:1+brr,"zb"); ctx.restore(); }
 
 // ---------- update ----------
 const HINTS=[
+  ["st1","STAY BEHIND THEM.   F   TAKE THEM QUIETLY.",()=>!!G.stealth&&!G.intro&&!G.chaos&&G.stealth.kills<2],
+  ["roll","S   ROLL THROUGH THEM.   YOU COME UP SHOOTING.",()=>LV===0&&!G.stealth&&G.kills>10&&G.kills<40],
   ["move","A / D   MOVE",()=>LV===0&&(G.lvT||0)<7&&G.p.x<330&&!G.intro],
   ["fire","HOLD F   SHOOT.   UP CLOSE IT'S A BOOT.",()=>LV===0&&G.kills<2&&G.zombies.some(z=>z.x>G.camX&&z.x<G.camX+VW)],
   ["jump","SPACE   JUMP.   HEADS ARE PLATFORMS.",()=>LV===0&&Math.abs(G.p.x-400)<110],
@@ -1528,7 +2008,7 @@ function fxUpdate(dt){ tossedUpdate(dt);
   for(const a of G.ashes){ a.t+=dt; if(a.t>.2){ const k=Math.min(1,(a.t-.2)/.8), yy=a.by-a.h*(1-k);
       for(let i=0;i<2;i++)part("a",a.x+(Math.random()-.5)*a.w*1.3,yy+Math.random()*8,(Math.random()-.5)*26,-30-Math.random()*50,.9+Math.random()*.9,Math.random()<.22?"#ff9a3c":"#1c1a19",1+Math.random()*1.8); } }
   if(G.ashes.length&&G.ashes[0].t>1.05)G.ashes=G.ashes.filter(a=>a.t<=1.05);
-  for(const c of G.corpses){ c.t+=dt; if(!c.dust&&c.t>.36){ c.dust=1; for(let i=0;i<4;i++)part("m",c.x+c.dir*c.h*(.2+Math.random()*.7),GROUND+2,(Math.random()-.5)*60,-12-Math.random()*16,.4,"#8a8f99",3+Math.random()*4); } c.x+=c.vx*dt; c.vx*=Math.max(0,1-dt*6); } if(G.corpses.length&&G.corpses[0].t>19)G.corpses.shift();
+  for(const c of G.corpses){ c.t+=dt; if(!c.dust&&c.t>.36){ c.dust=1; for(let i=0;i<4;i++)part("m",c.x+c.dir*c.h*(.2+Math.random()*.7),GROUND+2,(Math.random()-.5)*60,-12-Math.random()*16,.4,"#8a8f99",3+Math.random()*4); } if(c.rag)ragStep(c,dt); else { c.x+=c.vx*dt; c.vx*=Math.max(0,1-dt*6); } } if(G.corpses.length&&G.corpses[0].t>19)G.corpses.shift();
   for(const s of G.slashes)s.life-=dt; G.slashes=G.slashes.filter(s=>s.life>0);
   for(const L of G.lights)L.life-=dt; G.lights=G.lights.filter(L=>L.life>0);
   if(G.shake>0)G.shake-=dt*46; G.kickX*=Math.max(0,1-dt*13);
@@ -1537,7 +2017,7 @@ function lerpState(a){ const L=[G.p,...G.zombies,...G.cats];
   if(a<0){ for(const o of L){ if(o._x!==undefined){ o.x=o._x; o.y=o._y; o._x=undefined; } } if(G._cam!==undefined){ G.camX=G._cam; G._cam=undefined; } return; }
   if(a>=1)return; for(const o of L){ if(o.px===undefined)continue; o._x=o.x; o._y=o.y; o.x=o.px+(o.x-o.px)*a; o.y=o.py+(o.y-o.py)*a; }
   if(G.pcam!==undefined){ G._cam=G.camX; G.camX=G.pcam+(G.camX-G.pcam)*a; } }
-function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
+function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; } if(G.chaos&&MODE==="play"){ chaosScene(dt); return; }
   { const q=G.p; q.px=q.x; q.py=q.y; G.pcam=G.camX; for(const z of G.zombies){ z.px=z.x; z.py=z.y; } for(const c of G.cats){ c.px=c.x; c.py=c.y; } }
   if(G.dead&&G.death){ G.endT+=dt; deathScene(dt); return; }
   if(G.won||G.dead){ G.endT+=dt; const d2=dt*(G.dead?.4:1); G.t+=d2; ambient(d2); fxUpdate(d2);
@@ -1549,17 +2029,18 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
   if(G.fadeIn>0)G.fadeIn-=dt*.9; if(G.card>0)G.card-=dt;
   if(G.hsCd>0)G.hsCd-=dt; if(G.hitStop>0){ if(G.hsCd>0)G.hitStop=0; else { G.hitStop-=dt; if(G.hitStop<=0)G.hsCd=.15; return; } }
   if(G.cineCd>0)G.cineCd-=dt; if(G.cine){ G.cine.t+=dt; if(G.cine.t>=G.cine.dur)G.cine=null; }
-  if(G.slow>0){ G.slow-=dt; dt*=.4; }
+  { const dt0=dt; if(G.fin)dt*=finScale(G.fin); else if(G.slow>0){ G.slow-=dt; dt*=.4; } TSC=dt/dt0; }
   G.t+=dt; const p=G.p; ambient(dt);
   // ---- move
-  const dir=(keys.has("r")&&keys.has("l"))?(lastDirKey==="r"?1:-1):(keys.has("r")?1:0)-(keys.has("l")?1:0), MAXV=330*G.mod.spd;
-  if(dir){ p.vx+=dir*2800*dt; if(p.gunT<=0)p.face=dir; p.mface=dir; } else { p.vx>0?p.vx=Math.max(0,p.vx-2200*dt):p.vx=Math.min(0,p.vx+2200*dt); }
-  p.vx=Math.max(-MAXV,Math.min(MAXV,p.vx));
+  const dir=G.fin?0:((keys.has("r")&&keys.has("l"))?(lastDirKey==="r"?1:-1):(keys.has("r")?1:0)-(keys.has("l")?1:0)), MAXV=(G.stealth?150:330)*G.mod.spd, rolling=rollUpdate(dt,dir);
+  if(rolling){} else if(dir){ p.vx+=dir*2800*dt; if(p.gunT<=0)p.face=dir; p.mface=dir; } else { p.vx>0?p.vx=Math.max(0,p.vx-2200*dt):p.vx=Math.min(0,p.vx+2200*dt); }
+  if(!rolling)p.vx=Math.max(-MAXV,Math.min(MAXV,p.vx));
+  if(rolling)jumpBuf=0;
   if(jumpBuf>0){ jumpBuf-=dt; if(p.onGround||p.coyote>0){ p.vy=-700; p.onGround=false; p.coyote=0; jumpBuf=0; p.sq=1.16; SFX.jump(); } }   // buffered jump
   let g=1900; if(p.vy<0&&jumpHeld)g=1200; p.vy+=g*dt;
   p.x+=p.vx*dt;
   for(const pl of G.platforms){ if(!overlap(p,pl))continue;
-    const onTop=(p.y+p.h)<=pl.y+10;
+    const onTop=(p.y+p.h)<=platTop(pl,p.x+p.w/2)+(p.onGround&&pl.type!=="ground"&&(p.y+p.h)<GROUND-12?30:10);
     if(pl.push && !pl.wreck && !onTop && p.onGround && !(dir>0&&pl.x+pl.w>=LEVEL.exit-620)){ const PUSH=95, d=Math.sign(p.vx);
       const ox=pl.x, hitsProp=()=>G.platforms.some(q=>q!==pl&&q.type!=="ground"&&pl.x<q.x+q.w&&pl.x+pl.w>q.x), was=hitsProp();
       if(p.vx>0){ pl.x=Math.max(pl.x,Math.min(LEVEL.exit-620-pl.w, pl.x+Math.min(p.vx*dt,PUSH*dt))); p.x=pl.x-p.w; }
@@ -1571,8 +2052,9 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
     else if(!onTop){ const rising=p.vy<0&&(pl.h<=96||pl.push); if((p.x+p.w/2)<(pl.x+pl.w/2))p.x=pl.x-p.w; else p.x=pl.x+pl.w; if(!rising)p.vx=0; } }
   if(p.x<0)p.x=0; if(p.x>LEVEL.w-p.w)p.x=LEVEL.w-p.w;
   const wasAir=!p.onGround, fallV=p.vy, prevY=p.y; p.y+=p.vy*dt; p.onGround=false;
-  for(const pl of G.platforms){ if(!overlap(p,pl))continue;
-    if(p.vy>=0 && prevY+p.h<=pl.y+14){ p.y=pl.y-p.h; p.onGround=true; p.vy=0; }                    // landed on it
+  for(const pl of G.platforms){ if(!(p.x<pl.x+pl.w&&p.x+p.w>pl.x&&p.y<pl.y+pl.h&&p.y+p.h>pl.y-16))continue; const top=platTop(pl,p.x+p.w/2);
+    if(p.y+p.h<=top){ if(!wasAir&&p.vy>=0&&top-(p.y+p.h)<18){ p.y=top-p.h; p.onGround=true; p.vy=0; } continue; }      // still above the bodywork: nothing to hit yet. walking down a hood, he stays planted
+    if(p.vy>=0 && prevY+p.h<=top+(wasAir?14:32)){ p.y=top-p.h; p.onGround=true; p.vy=0; }                    // landed on it, or walked up its slope
     else if(p.vy<0 && prevY>=pl.y+pl.h-2){ p.y=pl.y+pl.h; p.vy=0; }                                 // bumped it from below
     else if(pl.type!=="ground"){ if((p.x+p.w/2)<(pl.x+pl.w/2))p.x=pl.x-p.w; else p.x=pl.x+pl.w; } }   // clipped its side: slide off, never through
   if(p.y+p.h>GROUND){ p.y=GROUND-p.h; p.vy=0; p.onGround=true; }
@@ -1580,12 +2062,12 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
   { const tl=(p.onGround?p.vx/330*.06:p.vx/330*.03+Math.max(-.07,Math.min(.09,p.vy/900*.09))*p.face), w=25; p.leanV+=(w*w*(tl-p.lean)-2*.5*w*p.leanV)*dt; p.lean+=p.leanV*dt; }   // lean is on a spring: stops and turns overshoot a little
   if(p.onGround&&wasAir&&fallV>420){ p.sq=.82; SFX.land(); for(let i=0;i<4;i++)part("m",p.x+p.w/2+(Math.random()-.5)*26,p.y+p.h-2,(Math.random()-.5)*70,-10,.35,"#8a8f99",4+Math.random()*4); }
   if(p.onGround){ p.coyote=.1; G.stompChain=0; } else if(p.coyote>0)p.coyote-=dt;
-  if(Math.abs(p.vx)>10&&p.onGround){ p.run+=Math.abs(p.vx)*dt*.02; const si=Math.floor(p.run/2); if(si!==p.stepI){ p.stepI=si; if(Math.abs(p.vx)>70)SFX.step(); } }
+  if(Math.abs(p.vx)>10&&p.onGround){ p.run+=p.vx*(p.face||1)*dt*.02; const si=Math.floor(p.run/2); if(si!==p.stepI){ p.stepI=si; if(Math.abs(p.vx)>70)SFX.step(); } }
   if(G.invuln>0)G.invuln-=dt; if(p.atkT>0)p.atkT-=dt; if(p.gunCd>0)p.gunCd-=dt; if(p.gunT>0)p.gunT-=dt; if(G.muzzle>0)G.muzzle-=dt; if(p.kick>0)p.kick=Math.max(0,p.kick-dt*50);
   if(G.flameT>0){ G.flameT-=dt; if(G.flameT<=0){ G.flameT=0; addFloat(p.x+p.w/2,p.y-14,"OUT OF GAS",FIRE,13); } }
   swapUpdate(dt);
   if(p.reload>0){ p.reload-=dt; if(!p.rlClick&&p.reload<(p.reloadMax||1)*.3){ p.rlClick=true; SFX.magIn(); } if(p.reload<=0){ G.mag=WPN[G.weapon].mag||24; SFX.rack(); } }
-  melee(); if(fireHeld||autoFireOn())attack();
+  if(G.finCd>0)G.finCd-=dt; if(G.fin)finUpdate(dt); else if(G.stealth)stealthUpdate(dt); else { finTry(); if(!G.fin){ melee(); if(fireHeld||autoFireOn())attack(); } }
   // ---- big cat (fish) and MEGA CAT
   if(p.vicious>0){ p.vicious-=dt; const bc=G.bigCat;
     if(bc.pcd>0)bc.pcd-=dt; if(bc.pounceT>0){ bc.pounceT-=dt; const z=bc.target, tx=(z&&!z.dead)?(z.x+(z.w?z.w/2:0)):bc.x, pr=1-bc.pounceT/.5;
@@ -1607,7 +2089,7 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
     if(G.megaX>G.camX+W+200||G.megaActive<=0){ G.megaActive=0; G.shake=Math.max(G.shake,14); } }
   // ---- spawn director: waves, breathers, the horde, the boss
   const prog=Math.min(1,p.x/LEVEL.exit), MARKS=[.12,.30,.48,.64];
-  if(!G.arena && G.waveIdx<MARKS.length && prog>MARKS[G.waveIdx]){ G.waveIdx++;                      // the street locks until the wave is dead
+  if(!G.stealth && !(G.card>0) && !G.arena && G.waveIdx<MARKS.length && prog>MARKS[G.waveIdx]){ G.waveIdx++;                      // the street locks until the wave is dead
     G.arena={x0:G.camX,x1:G.camX+VW,total:[14,20,28,36][G.waveIdx-1],spawned:0,t:0}; G.spawnT=.8; G.shake=Math.max(G.shake,8); SFX.roar();
     banner("WAVE "+G.waveIdx,["they heard you","more of them","they brought friends","no more quiet"][G.waveIdx-1],BONE); }
   if(prog>.78 && !G.hordeWarned){ G.hordeWarned=true; G.surgeT=6; G.shake=Math.max(G.shake,14); SFX.roar(); banner("THE HORDE","the cat is starving. feed it.",RED); }
@@ -1633,7 +2115,7 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
     if(b.life>0&&b.y>GROUND+3){ b.life=0; burstFx(b.x,GROUND+2,"#ffe0a0",3); } }
   G.bullets=G.bullets.filter(b=>b.life>0 && vis(b.x,4));
   // ---- boot / fist
-  meleeUpdate(dt); vehUpdate(dt);
+  meleeUpdate(dt); vehUpdate(dt); fallerUpdate(dt); fireUpdate(dt);
   // ---- delayed pops (short fuse perk, barrel chains)
   if(G.pops.length){ for(const q of G.pops){ q.t-=dt; if(q.t<=0){ if(q.barrel)explodeBarrel(q.barrel); else { explodeAt(q.x,q.y,95,"pop",false); SFX.kill(); } } } G.pops=G.pops.filter(q=>q.t>0); }
   // ---- cats
@@ -1646,37 +2128,40 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
       else { c.atkT=0; c.pounce=false; } } }
   // ---- zombies
   let crowd=false;
-  for(const z of G.zombies){ if(z.dead)continue; if(z.boss)z.walk+=dt*4; if(z.hitFlash>0)z.hitFlash-=dt; if(z.hitT>0)z.hitT-=dt; if(z.thrown){ thrownUpdate(z,dt); continue; } if(z.carried){ z.y=Math.min(z.y,GROUND-z.h+4); continue; }
-    if(z.burn>0){ z.burn-=dt; z.hp-=(z.boss?13:7)*dt;                                                    // on fire
+  for(const z of G.zombies){ if(z.dead)continue; if(z.boss)z.walk+=dt*4; if(z.hitFlash>0)z.hitFlash-=dt; if(z.hitT>0)z.hitT-=dt; if(z.react&&z.react.t>0)z.react.t-=dt; if(z.thrown){ thrownUpdate(z,dt); continue; } if(z.sl&&!z.carried){ sleeperUpdate(z,dt); continue; } if(z.carried){ z.y=Math.min(z.y,GROUND-z.h+4); continue; }
+    if(z.burn>0){ if(!z.boss&&!z.carried&&!z.thrown){ z.x+=Math.sin(G.t*8+z.x*.05+(z.var||0)*9)*120*dt; if(Math.random()<dt*2.2)for(const o of G.zombies){ if(o!==z&&!o.dead&&!(o.burn>0)&&Math.abs(o.x-z.x)<30&&Math.abs(o.y-z.y)<30){ o.burn=.9; break; } } if(Math.random()<dt*.9)fireAt(z.x+z.w/2,1.4); }      // they run burning, and set each other alight
+    z.burn-=dt; z.hp-=(z.boss?13:7)*dt;                                                    // on fire
       if(Math.random()<.55)part("f",z.x+Math.random()*z.w,z.y+z.h*(.15+Math.random()*.75),(Math.random()-.5)*40,-90-Math.random()*90,.28+Math.random()*.2,null,3+Math.random()*4);
       if(z.hp<=0){ if(z.boss)killBoss(z); else killZombie(z,0,"fire"); continue; } }
-    if(z.boss){ if(z.iT>0)z.iT-=dt; updateBoss(z,dt); continue; }
+    if(z.boss){ if(z.iT>0)z.iT-=dt; if(!z.finLock)updateBoss(z,dt); continue; }
     if(z.emT>0){ z.emT-=dt; if(!z.fly)z.y=GROUND-z.h;
       if(z.emSpot&&z.emSpot.env&&!z.grabbed){ const sp=z.emSpot, by=GROUND-(sp.elevated||0);
         if(z.emT<.3 && Math.abs((p.x+p.w/2)-sp.x)<68 && p.y<by && (p.y+p.h)>by-z.h){ z.grabbed=true; if(hurtPlayer()){ const d=(p.x+p.w/2)<sp.x?1:-1; p.vx=d*-200; p.vy=-160; } } }
       continue; }
-    if(z.fly){ z.vy=(z.vy||0)+1900*dt; z.y+=z.vy*dt; if(z.y>=GROUND-z.h){ z.y=GROUND-z.h; z.fly=false; z.vy=0; } continue; }
+    if(z.fly){ z.vy=(z.vy||0)+1900*dt; z.y+=z.vy*dt; if(z.fvx)z.x+=z.fvx*dt; z.spinA=(z.spinA||0)+(z.fvx?Math.sign(z.fvx):z.face)*dt*(z.fell?7:3.2); if(z.y>=GROUND-z.h){ z.y=GROUND-z.h; z.fly=false; const hard=(z.fell||0)>150; z.vy=0; z.spinA=((z.spinA||0)+Math.PI)%(2*Math.PI)-Math.PI; z.stagger=hard?1.1:.5; z.react={k:"gut",t:hard?.9:.35}; SFX.thunk(); G.shake=Math.max(G.shake,hard?7:3); for(let i=0;i<5;i++)part("m",z.x+z.w/2+(Math.random()-.5)*30,GROUND-4,(Math.random()-.5)*90,-20-Math.random()*40,.45,"#6a6c74",6+Math.random()*6);
+      if(hard&&Math.random()<.4){ SFX.crack(); G.killPow={vx:(z.fvx||0)*.6,vy:160,spin:1.5}; killZombie(z,10,"melee",z.face); G.killPow=null; } z.fvx=0; z.fell=0; } continue; }
     if(z.kv){ z.x+=z.kv*dt; z.kv*=Math.max(0,1-dt*9); if(Math.abs(z.kv)<8)z.kv=0; }
     if(z.stagger>0){ z.stagger-=dt; z.atkPh=0; z.hitP=false; }                                                  // shooting it interrupts the attack
     else if(z.atkPh){ z.atkT-=dt;
       if(z.atkPh===1){ if(z.atkT<=0){ z.atkPh=2; z.atkT=.12; } }                                                // wind-up: leans back, flashes
       else if(z.atkPh===2){ z.x+=z.face*500*dt; if(!z.hitP&&overlap(p,z)){ z.hitP=true; if(hurtPlayer(z.tier===3?2:1)){ p.vx=z.face*260; p.vy=-220; } } if(z.atkT<=0){ z.atkPh=3; z.atkT=z.tier===1?.45:.6; } }   // lunge: the only moment it can hurt you
       else if(z.atkT<=0){ z.atkPh=0; z.hitP=false; } }
-    else { const dxp=(p.x+p.w/2)-(z.x+z.w/2), adx=Math.abs(dxp); z.face=dxp>0?1:-1;
+    else { const dxp=(p.x+p.w/2)-(z.x+z.w/2), adx=Math.abs(dxp); if(adx>9)z.face=dxp>0?1:-1;
       if(adx<z.w/2+p.w/2+14 && p.y+p.h>z.y+8 && p.y<z.y+z.h){ z.atkPh=1; if(Math.random()<.5)SFX.snarl(); z.atkT=z.tier===3?.55:z.tier===2?.42:.32; }
       else if(adx>10){ z.x+=z.face*z.spd*(z.burn>0?.7:1)*dt; z.walk+=dt*Math.max(2.8,z.spd/14)*(z.burn>0?1.8:1); } }
-    z.y=GROUND-z.h;
-    if(z.climbT>0){ z.climbT-=dt; for(const pl of G.platforms){ if(pl.push && z.x+z.w>pl.x && z.x<pl.x+pl.w){ z.y=pl.y-z.h+10; break; } } }
-    else for(const pl of G.platforms){ if(pl.push && overlap(z,pl)){ const left=(z.x+z.w/2)<(pl.x+pl.w/2); if(left)z.x=pl.x-z.w; else z.x=pl.x+pl.w;
-      z.blockT=(z.blockT||0)+dt; if(Math.random()<dt*1.6){ const v=vst(pl); v.rv+=(left?1:-1)*(.9+Math.random()); v.bv+=30; if(!v.dead&&Math.random()<.35)vehHit(pl,.02,left?pl.x+6:pl.x+pl.w-6,z.y+z.h*.45,"slam"); } if(z.blockT>1.6){ z.blockT=0; z.climbT=pl.w/Math.max(40,z.spd)+.6; }
-      if(pl.ramT>0 && ((pl.ram>0&&!left)||(pl.ram<0&&left))){ damageZombie(z,3,"melee",pl.ram); vehHit(pl,.03,left?pl.x+6:pl.x+pl.w-6,z.y+z.h*.5,"slam"); z.x+=pl.ram*32; z.stagger=.3; G.shake=Math.max(G.shake,5); } } }
+    { const y0=z.y, cx=z.x+z.w/2; let ty=GROUND-z.h, car=null;
+      if(z.climbT>0||z.onCar){ if(z.climbT>0)z.climbT-=dt; for(const pl of G.platforms){ const m=z.w/2+4; if(pl.push && cx>pl.x-m && cx<pl.x+pl.w+m){ car=pl; break; } } if(car)ty=platTop(car,cx)-z.h+3; z.onCar=!!car; }
+      z.y=y0<ty?Math.min(ty,y0+820*dt):Math.max(ty,y0-430*dt); }      /* up and over at a climbing pace, and down off the end with weight: never a jump cut */
+    if(!z.onCar&&!(z.climbT>0))for(const pl of G.platforms){ if(pl.push && overlap(z,pl)){ const deep=Math.min(z.x+z.w-pl.x,pl.x+pl.w-z.x); if(deep>z.w*.75){ z.onCar=true; z.climbT=Math.max(z.climbT||0,.4); break; } const left=(z.x+z.w/2)<(pl.x+pl.w/2); if(left)z.x=pl.x-z.w; else z.x=pl.x+pl.w;
+      z.blockT=(z.blockT||0)+dt; z.walk-=dt*Math.max(2.8,z.spd/14)*.8; if(Math.random()<dt*1.6){ const v=vst(pl); v.rv+=(left?1:-1)*(.9+Math.random()); v.bv+=30; if(!v.dead&&Math.random()<.35)vehHit(pl,.02,left?pl.x+6:pl.x+pl.w-6,z.y+z.h*.45,"slam"); } if(z.blockT>1.6){ z.blockT=0; z.climbT=pl.w/Math.max(40,z.spd)+.6; }
+      if(pl.ramT>0 && ((pl.ram>0&&!left)||(pl.ram<0&&left))){ damageZombie(z,3,"melee",pl.ram); vehHit(pl,.03,left?pl.x+6:pl.x+pl.w-6,z.y+z.h*.5,"slam"); z.kv=pl.ram*430; z.stagger=.3; G.shake=Math.max(G.shake,5); } } }
     if(z.dead)continue;
     if(overlap(p,z)){ const stomp=p.vy>0&&(p.y+p.h-z.y)<34;
       if(stomp){ z.atkPh=0; p.vy=-520; damageZombie(z,3,"stomp",0); z.stagger=.3; G.stompChain++; const bonus=50*G.stompChain; G.score+=bonus; G.shake=Math.max(G.shake,5+G.stompChain*2);
         if(G.stompChain>1){ addFloat(z.x+z.w/2,z.y-22,"STOMP ×"+G.stompChain,"#9fe4ff",13+Math.min(8,G.stompChain*2)); G.hitStop=Math.max(G.hitStop,.04); } }
       else if(z.stagger<=0&&p.onGround)crowd=true; } }
-  if(crowd&&p.vicious<=0)p.vx=Math.max(-150,Math.min(150,p.vx));                                   // wading through bodies is slow
-  G.zombies=G.zombies.filter(z=>!z.dead && (z.boss || (z.x>G.camX-320 && z.x<G.camX+W+420)));
+  if(crowd&&p.vicious<=0&&!p.roll)p.vx=Math.max(-150,Math.min(150,p.vx));                                   // wading through bodies is slow
+  G.zombies=G.zombies.filter(z=>!z.dead && (z.boss || z.sl || (z.x>G.camX-320 && z.x<G.camX+W+420)));
   G.groanT-=dt; if(G.groanT<=0){ G.groanT=1.2+Math.random()*2.6; if(G.zombies.length)SFX.groan(); }
   G.beatT-=dt; if(G.beatT<=0){ G.beatT=.6; const it=Math.min(1,G.zombies.length/18+(G.bossSpawned&&!G.bossDead?.5:0)); if(it>.12)SFX.beat(it); }
   // ---- cats trail
@@ -1699,9 +2184,9 @@ function update(dt){ if(G.intro&&MODE==="play"){ introScene(dt); return; }
   if(G.comboT>0){ G.comboT-=dt; if(G.comboT<=0)G.combo=0; }
   for(const pl of G.platforms){ if(pl.ramT>0)pl.ramT-=dt; if(pl.flash>0)pl.flash-=dt; }
   // ---- camera: looks ahead of where you are heading, creeps in toward the boss
-  const pz=Math.max(0,(prog-.45)/.55); let tz=1+pz*.2; if(bossAlive)tz=1.26; if(G.cine)tz=Math.max(tz,G.cine.zoom); setZoom(ZOOM+(tz-ZOOM)*Math.min(1,dt*(G.cine?9:.8)));
+  const pz=Math.max(0,(prog-.45)/.55); let tz=1+pz*.2; if(bossAlive)tz=1.26; if(G.stealth)tz=1.22; if(G.cine)tz=Math.max(tz,G.cine.zoom); if(G.fin)tz=1.45; setZoom(ZOOM+(tz-ZOOM)*Math.min(1,dt*((G.cine||G.fin)?9:.8)));
   if(p.mface!==G.lookTgt){ G.lookSw+=dt; if(G.lookSw>.4){ G.lookTgt=p.mface; G.lookSw=0; } } else G.lookSw=0; G.look+=(G.lookTgt-G.look)*Math.min(1,dt*1.5);
-  const tcx=G.arena?Math.max(G.arena.x0,Math.min(Math.max(G.arena.x0,G.arena.x1-VW),p.x+p.w/2-VW/2)):p.x+p.w/2-VW*(.5-.16*G.look); G.camX+=(tcx-G.camX)*Math.min(1,dt*7); G.camX=Math.max(0,Math.min(LEVEL.w-VW,G.camX));
+  const tcx=G.fin?G.fin.cx-VW/2+finDolly(G.fin):G.arena?Math.max(G.arena.x0,Math.min(Math.max(G.arena.x0,G.arena.x1-VW),p.x+p.w/2-VW/2)):p.x+p.w/2-VW*(.5-.16*G.look); { const cm=G.fin?2:G.arena?1:0; if(cm!==G.camMode){ if(G.camMode!==undefined&&cm!==2)G.camK=.9; G.camMode=cm; } G.camK=Math.min(7,(G.camK||7)+dt*4.5); } G.camX+=(tcx-G.camX)*Math.min(1,dt*(G.fin?(G.fin.t<.3?11:60):G.camK)); G.camX=Math.max(0,Math.min(LEVEL.w-VW,G.camX));
 }
 
 // ---------- render: back to front, layer by layer ----------
@@ -1756,7 +2241,7 @@ function render(){
     light(ex+20,GROUND-80,280,.85,"190,220,255",1,.25); }
   txt(bossAlive?"LOCKED":LEVEL.door,ex+36,GROUND-178,10,bossAlive?"rgba(255,90,77,.9)":"rgba(200,230,255,.95)","center",800,3);
   // the dead
-  for(const c of G.corpses){ if(!vis(c.x-90,180))continue; const k=Math.min(1,Math.max(0,c.t-.06)/.3), e=k*k*(3-2*k), cend=c.end||1.5, crot=k<1?e*e*1.62:cend+(1.62-cend)*Math.exp(-(c.t-.36)*16), imp=k>=1?Math.max(0,1-(c.t-.36)/.14):0, fade=c.t>16?Math.max(0,1-(c.t-16)/3):1, s=c.h/c.im.height, w=c.im.width*s;
+  for(const c of G.corpses){ if(!vis(c.x-90,180))continue; if(c.rag){ if(!c.hero)drawRagCorpse(c); continue; } const k=Math.min(1,Math.max(0,c.t-.06)/.3), e=k*k*(3-2*k), cend=c.end||1.5, crot=k<1?e*e*1.62:cend+(1.62-cend)*Math.exp(-(c.t-.36)*16), imp=k>=1?Math.max(0,1-(c.t-.36)/.14):0, fade=c.t>16?Math.max(0,1-(c.t-16)/3):1, s=c.h/c.im.height, w=c.im.width*s;
     const bn=k>=1?Math.max(0,Math.sin(Math.min(1,(c.t-.3)/.22)*3.1416))*.09:0, pool=Math.max(0,Math.min(1,(c.t-.5)/3));
     if(pool>0){ ctx.fillStyle=`rgba(70,6,8,${.55*fade})`; ctx.beginPath(); ctx.ellipse(c.x+c.dir*c.h*.5,GROUND+7,c.h*.42*pool,5.5*pool,0,0,6.28); ctx.fill(); }
     ctx.save(); ctx.globalAlpha=.84*fade; ctx.translate(c.x,GROUND+5-(c.w*.34)*e); ctx.rotate(c.dir*crot); ctx.scale((c.face<0?-1:1)*(1+.08*imp),1-.10*imp);
@@ -1776,9 +2261,9 @@ function render(){
         else { const ph=sp.plat?sp.plat.h:60, oy=(z.emT/.7)*ph*1.12; spr(fr||IMG.op,z.x+z.w/2,GROUND+oy,z.h,z.face); if(sp.plat){ const im=IMG[sp.plat.type]; if(im&&im.width){ if(sp.plat.push)drawVehicle(sp.plat,im,(bhash((sp.plat.x0||sp.plat.x)*1.3)-.5)*.13); else ctx.drawImage(im,sp.plat.x,sp.plat.y,sp.plat.w,sp.plat.h); }; } } }
       return; }
     const cx=z.x+z.w/2, by=z.y+z.h+(z.dz||0); groundShadow(cx,by,z.w*.72); reflect(fr||IMG.op,cx,z.h,z.face,.10);
-    const hk=Math.max(0,(z.hitT||0)/.12), lean=((z.thrown||z.carried)?(z.spinA||0):0)+(z.feed?z.face*(.82+.17*Math.sin(G.t*11+z.x*.7)):0)+Math.max(-.3,Math.min(.3,(z.kv||0)/1500))+(z.stagger>0&&!z.kv?-z.face*.05:z.face*.03)+(z.hitDir||0)*.2*hk+(z.atkPh===1?-z.face*.18:z.atkPh===2?z.face*.34:0), zb=by-Math.abs(Math.sin(z.walk*1.5708))*3, zsx=(1-.12*hk)*(z.atkPh===2?1.12:1), zsy=(1+.10*hk)*(z.atkPh===1?1.06:1);
-    chr(fr||IMG.op,cx,zb+(z.feed?5:0),z.h,z.face,lean,zsx,zsy,"z"); if(z.rip)drawRip(z,cx);
-    if((STYLE===2||STYLE===7||STYLE===11||STYLE===12)&&!z.feed&&!z.thrown&&!z.carried&&!(G.intro&&G.intro.z===z)){ ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.fillStyle=STYLE===7?"rgba(255,255,255,.95)":STYLE>=11?"rgba(150,255,90,.95)":z.tier===3?"rgba(255,70,50,.95)":"rgba(214,255,150,.9)"; ctx.fillRect(cx+z.face*z.h*.05-1,z.y+z.h*.085,2.4,2.4); ctx.restore(); }
+    const hk=Math.max(0,(z.hitT||0)/.12), lean=((z.thrown||z.carried||z.fly)?(z.spinA||0):(z.spinA?(z.spinA*=Math.pow(.78,FDT),Math.abs(z.spinA)<.02?(z.spinA=0):z.spinA):0))+(z.feed?z.face*(.82+.17*Math.sin(G.t*11+z.x*.7)):0)+Math.max(-.3,Math.min(.3,(z.kv||0)/1500))+(z.stagger>0&&!z.kv?-z.face*.05:z.face*.03)+(z.hitDir||0)*.2*hk+(z.atkPh===1?-z.face*.18:z.atkPh===2?z.face*.34:0), zb=by-Math.abs(Math.sin(z.walk*1.5708))*3, zsx=(1-.12*hk)*(z.atkPh===2?1.12:1), zsy=(1+.10*hk)*(z.atkPh===1?1.06:1);
+    chr(fr||IMG.op,cx,zb+(z.feed?5:0),z.h,z.face,lean,zsx,zsy,z.tier>1?"z"+z.tier:"z"); ;
+    if((STYLE===2||STYLE===7||STYLE===11||STYLE===12)&&!z.feed&&!z.thrown&&!z.carried&&!(G.intro&&G.intro.z===z)){ ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.fillStyle=STYLE===7?"rgba(255,255,255,.95)":STYLE>=11?(z.tier===2?"rgba(90,240,170,.95)":z.tier===3?"rgba(220,255,80,.95)":"rgba(150,255,90,.95)"):z.tier===3?"rgba(255,70,50,.95)":"rgba(214,255,150,.9)"; ctx.fillRect(cx+z.face*z.h*.05-1,z.y+z.h*.085,2.4,2.4); ctx.restore(); }
     if(z.hitFlash>0){ ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.globalAlpha=.85; spr2(fr||IMG.op,cx,zb,z.h,z.face,lean,zsx,zsy); ctx.restore(); }
     if(z.atkPh===1&&fr)tintSpr(fr,"#ffffff",.14+.3*(1-Math.max(0,z.atkT)/.55),cx,zb,z.h,z.face,lean,0,zsx,zsy);
     if(z.burn>0&&fr){ tintSpr(fr,"#ff6a14",.42+.22*Math.sin(G.t*34+z.x),cx,zb,z.h,z.face,lean); light(cx,z.y+z.h*.4,100,.6,"255,140,50",1,.4); }
@@ -1804,11 +2289,12 @@ function render(){
   else frame=!p.onGround?RUN[2]:(moving?RUN[Math.floor(p.run)%6]:(IMG.idle.width?IMG.idle:RUN[0]));
   const MV=MOVES[p.atkType]||MOVES.jab, mt=p.atkT>0?MV.t-p.atkT:-1, mph=mt<0?0:mt<MV.hit*.6?1:mt<MV.hit+.09?2:3, moff=mph===1?-5:mph===2?(mt<.06?10:6):mph===3?3*(p.atkT/.10):0, mrot=mph===1?-.10:mph===2?.11:mph===3?.05:0;   // melee: wind-up, strike, recover
   const opRig=hrReady("op"); if(opRig)frame=hrPose("op",hrEase(p,opParams(p,moving,armed,mph)),OPC);
+  if(G.dead&&G.death&&G.death.c&&G.death.c.rag)drawRagCorpse(G.death.c);
   if(!G.dead){ const pcx=p.x+p.w/2-(opRig?0:p.face*(p.gunT>0?p.kick:0))+p.face*moff*(opRig?.5:1); groundShadow(p.x+p.w/2,p.y+p.h,p.w*.85); if(p.onGround)reflect(frame||IMG.op,pcx,p.h,p.face,.14);
     const idle=p.onGround&&!moving&&!armed&&p.atkT<=0, br=Math.sin(G.t*2.4), psy=p.sq*(idle&&!opRig?1+br*.025:1), psx=(1+(1-p.sq)*.55)*(idle&&!opRig?1-br*.01:1), prot=opRig?p.lean*.5:p.face*mrot+p.lean+(idle?Math.sin(G.t*.9)*.018:0)-(armed?p.face*p.kick*.01:0);
     if(mph===2){ for(const gh of [[-20,.16],[-10,.32]]){ ctx.save(); ctx.globalAlpha=gh[1]; spr2(frame||IMG.op,pcx+p.face*gh[0],p.y+p.h,p.h,p.face,prot,psx,psy); ctx.restore(); } }
     if(opRig&&HR.nk)drawScarf(pcx,p);
-    if(!(G.invuln>0&&Math.floor(G.t*18)%2===0)){ ctx.save(); chr(frame||IMG.op,pcx,p.y+p.h,p.h,p.face,prot,psx,psy); ctx.restore();
+    if(!(G.invuln>0&&Math.floor(G.t*18)%2===0)){ ctx.save(); if(p.roll){ const u=Math.min(1,p.roll.t/p.roll.d), th=p.roll.dir*6.2832*u, bell=Math.sqrt(Math.max(0,Math.sin(Math.PI*u))), ox=p.roll.dir*.2*p.h*bell, oy=-.16*p.h, RR=p.h*(.16+.13*bell+(u>.5?.1*Math.sin(Math.PI*(u-.5)/.5):0)), cs=Math.cos(th), sn=Math.sin(th); chr(frame||IMG.op,pcx-(ox*cs-oy*sn),p.y+p.h-RR-(ox*sn+oy*cs),p.h,p.face,th,psx,psy); }      /* he turns about the middle of the ball he has made of himself, and that ball rests on the ground */ else chr(frame||IMG.op,pcx,p.y+p.h,p.h,p.face,prot,psx,psy); if(G.fin)drawFinWorld(); if(G.chaos&&G.chaos.kn){ const kn=G.chaos.kn, im=IMG.g_knife; ctx.save(); ctx.translate(kn.x,kn.y); ctx.rotate(kn.rot); ctx.drawImage(im,-7,-1.7,14,3.5); ctx.restore(); } ctx.restore(); drawStealthMarks();
       if(G.hurtFlash>.42){ ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.globalAlpha=.9; spr2(frame||IMG.op,pcx,p.y+p.h,p.h,p.face,prot,psx,psy); ctx.restore(); }
       if(armMode&&!opRig){ const fl=G.flameT>0, sg=fl||G.weapon==="shotgun"; ctx.save(); ctx.translate(pcx+p.face*2,p.y+p.h*.36); ctx.scale(p.face,1); ctx.rotate(p.aimA-p.kick*.035); ctx.translate(-p.kick*.7,0);
         ctx.fillStyle="#24242d"; ctx.fillRect(-3,-4.5,23,9); ctx.fillStyle="rgba(170,190,215,.28)"; ctx.fillRect(-3,-4.5,23,1.5); ctx.fillStyle="#c9a084"; ctx.fillRect(19,-3.5,6,7);           // sleeve, rim light, hand
@@ -1827,11 +2313,9 @@ function render(){
   if(STYLE===12){ ctx.fillStyle="#d81a20"; for(const pt of G.parts){ if(pt.k!=="b"&&pt.k!=="g")continue; ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.r*1.1,0,6.28); ctx.fill(); } }
   // slashes + particles
   for(const s of G.slashes){ const a=Math.max(0,s.life/.28); ctx.strokeStyle=s.col; ctx.globalAlpha=a; ctx.lineWidth=3; for(let k=-1;k<=1;k++){ ctx.beginPath(); ctx.moveTo(s.x-26,s.y-14+k*12); ctx.lineTo(s.x+26,s.y+14+k*12); ctx.stroke(); } ctx.globalAlpha=1; }
-  if(G.flameT>0&&p.gunT>.08&&!G.dead){ const m=gunMuzzle(), L=150+Math.sin(G.t*47)*18+Math.random()*14, wd=20+Math.random()*5; ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.translate(m.x,m.y); ctx.rotate(G.flameA||0);
-    const g=ctx.createLinearGradient(0,0,L,0); g.addColorStop(0,"rgba(255,246,214,.95)"); g.addColorStop(.3,"rgba(255,186,80,.7)"); g.addColorStop(1,"rgba(230,80,20,0)"); ctx.fillStyle=g;
-    ctx.beginPath(); ctx.moveTo(0,-2.5); ctx.quadraticCurveTo(L*.5,-wd,L,-wd*.4); ctx.quadraticCurveTo(L*1.08,0,L,wd*.4); ctx.quadraticCurveTo(L*.5,wd,0,2.5); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  drawFires(); drawFlameJet();
   ctx.save(); ctx.globalCompositeOperation="lighter";                                            // fire: white-hot at the nozzle, orange, then dull red
-  for(const pt of G.parts){ if(pt.k!=="f")continue; const k=1-pt.life/pt.max, al=(k<.15?.9:(1-k)*.75);
+  for(const pt of G.parts){ if(pt.k!=="f")continue; const k=1-pt.life/pt.max, al=(k<.15?.9:(1-k)*.75)*((G.fin||G.chaos)?.25:1);
     ctx.fillStyle=k<.22?`rgba(255,238,190,${al})`:k<.55?`rgba(255,160,50,${al*.8})`:`rgba(210,64,24,${al*.55})`; ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.r,0,6.28); ctx.fill(); }
   ctx.restore();
   for(const pt of G.parts){ if(pt.k==="f")continue; const a=Math.max(0,Math.min(1,pt.life/pt.max*1.6));
@@ -1846,6 +2330,8 @@ function render(){
   drawFog(1); drawRain(1); drawEmbers(mixN(ZA.embers?1:0,ZB.embers?1:0,zt)); drawBeams(mixN(ZA.beams?1:0,ZB.beams?1:0,zt)); drawDust(mixN(ZA.dust?1:0,ZB.dust?1:0,zt));
   // L5 light: the scene goes dark, the lights bring it back
   if(G.dead&&G.death)light(G.death.x,GROUND-36,250,.9,null);
+  if(G.fin){ light(G.fin.cx,GROUND-60,G.fin.K.big?320:240,1,null); light(G.fin.cx,GROUND-150,200,.8,null); }
+  if(G.chaos){ const cz=G.chaos.z; light(p.x+p.w/2,GROUND-56,220,1,null); if(cz&&!cz.dead)light(cz.x+cz.w/2,GROUND-60,200,1,null); }
   if(G.intro){ const iz=G.intro.z; light(iz.x+iz.w/2+16,GROUND-46,190,.75,null); if(G.intro.turned)light(iz.x+iz.w/2-8,iz.y+iz.h*.15,70,.45,"150,255,96",1,.25); }
   if(!G.dead){ light(p.x+p.w/2,p.y+p.h*.45,270,.8,null); light(p.x+p.w/2,p.y+p.h*.4,120,.5,"150,190,235",1,.16); }
   for(const L of G.lights){ const a=Math.max(0,L.life/L.max); light(L.x,L.y,L.r*1.5,a,L.col,1,.5); }
@@ -1859,7 +2345,7 @@ function render(){
   const pain=Math.max(G.hurtFlash>0?G.hurtFlash*1.2:0,(G.hp===1&&!G.dead&&MODE==="play")?.3+.2*Math.sin(G.t*6):0);
   if(pain>0){ const pg=ctx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.8); pg.addColorStop(0,"rgba(160,10,10,0)"); pg.addColorStop(1,`rgba(160,10,10,${Math.min(.75,pain)})`); ctx.fillStyle=pg; ctx.fillRect(0,0,W,H); }
   stylePost(ty);
-  if(MODE==="play"&&!G.intro)drawHUD(bossAlive);
+  if(MODE==="play"&&!G.intro&&!G.fin&&!G.dead&&!G.chaos)drawHUD(bossAlive);
 }
 function drawHUD(bossAlive){ const p=G.p;
   // health + xp
@@ -1909,7 +2395,7 @@ function drawTitle(){ shade(.5); const g=ctx.createLinearGradient(0,H*.3,0,H); g
   txt("A  D  MOVE      SPACE  JUMP      F  FIRE      C  CATS      P  PAUSE      H  CONTROLS      M  SOUND",W/2,H-40,10,"rgba(244,237,224,.5)","center",700,2);
   if(BEST>0)txt("BEST  "+BEST.toLocaleString(),W/2,H-62,10,GOLD,"center",800,3); }
 const DEATHS=["They ate well.","The cats will find someone else.","So close to the mall, too.","You were the loud one.","Nobody's coming. Told you."];
-function drawEnd(){ if(G.dead)drawDeathFx(); const a=G.dead?Math.max(0,Math.min(1,(G.endT-(G.death&&G.death.alone?2.2:4.5))*1.3)):Math.min(1,G.endT*1.6); shade(.72*a); ctx.globalAlpha=a; const won=G.won, y=H*.36;
+function drawEnd(){ if(G.dead)drawDeathFx(); const a=G.dead?Math.max(0,Math.min(1,(G.endT-(G.death&&G.death.alone?DCARD_ALONE:DCARD))*1.3)):Math.min(1,G.endT*1.6); shade(.72*a); ctx.globalAlpha=a; const won=G.won, y=H*.36;
   txt(won?"YOU MADE IT":"YOU DIED",W/2,y,64,won?GOLD:RED,"center",800,8); ctx.fillStyle=won?GOLD:RED; ctx.fillRect(W/2-36,y+18,72,3);
   txt(won?"The train still runs. So do you.":DEATHS[(G.kills+G.heads)%DEATHS.length],W/2,y+46,13,"rgba(244,237,224,.75)","center",500,1);
   let rank=G.score>=95000?"S":G.score>=70000?"A":G.score>=40000?"B":G.score>=15000?"C":"D"; if(!won&&(rank==="S"||rank==="A"))rank="B";
@@ -1933,19 +2419,19 @@ function drawFlow(){
   if(G.clearT>0){ const a=Math.max(0,Math.min(1,(G.clearT-1.1)/1.0)); txt("LEVEL CLEAR",W/2,H*.34,40,GOLD,"center",800,8); ctx.fillStyle=GOLD; ctx.fillRect(W/2-30,H*.34+12,60,2); txt("+"+(1000+G.hp*300).toLocaleString(),W/2,H*.34+34,13,"rgba(244,237,224,.8)","center",800,3); shade(a); }
   if(G.fadeIn>0)shade(Math.min(1,G.fadeIn));
   if(G.card>0&&MODE==="play"){ const a=Math.max(0,Math.min(1,G.card*1.4,(3.6-G.card)*2)); ctx.globalAlpha=a; txt("LEVEL "+(LV+1),W/2,H*.40,12,RED,"center",800,6); txt(LEVEL.name,W/2,H*.40+44,44,BONE,"center",800,8+G.card*1.5); ctx.fillStyle=RED; ctx.fillRect(W/2-36,H*.40+60,72,3); ctx.globalAlpha=1; } }
-function present(){ render(); if(MODE==="play"&&G.intro)drawIntroFx(); else if(MODE==="play"&&!G.dead&&!G.won){ drawCine(); drawFlow(); };
+function present(){ render(); if(MODE==="play"&&G.chaos)drawChaosFx(); else if(MODE==="play"&&G.intro)drawIntroFx(); else if(MODE==="play"&&!G.dead&&!G.won){ if(G.fin)drawFinFx(); else { drawCine(); drawFlow(); } };
   if(MODE==="title")drawTitle(); else if(G.won||G.dead)drawEnd(); else if(G.perk)drawPerk();
   else if(userPaused){ shade(.7); txt("PAUSED",W/2,H/2-6,46,BONE,"center",800,10); txt("P  RESUME      H  CONTROLS      M  SOUND "+(MUSIC?"ON":"OFF")+"      R  RESTART",W/2,H/2+30,11,"rgba(244,237,224,.6)","center",800,3); } }
-let HOLD=false;
+let HOLD=false, FDT=1;
 function frame(now){ requestAnimationFrame(frame); if(paused||HOLD||(TOUCHMODE&&innerHeight>innerWidth)){ last=now; return; } let dt=(now-last)/1000; last=now; if(dt>.1)dt=.1; pollPad();
   if(MODE==="title"){ G.t+=dt; ambient(dt); }
   else if(!userPaused){ if(G.perk)G.perk.t+=dt; else { acc+=dt; while(acc>=STEP){ update(STEP); acc-=STEP; if(G.perk){ acc=0; break; } } } }
-  { const al=(MODE==="play"&&!userPaused&&!G.perk)?acc/STEP:1; lerpState(al); present(); lerpState(-1); }
+  { const al=(MODE==="play"&&!userPaused&&!G.perk)?acc/STEP:1; FDT=Math.max(.25,Math.min(3,dt*60)); lerpState(al); present(); lerpState(-1); FDT=1; }
   if(AC&&RAING){ RAING.gain.setTargetAtTime(MUSIC?G.rainAmt*(userPaused?.003:RAINV):0,AC.currentTime,.25); DRONEG.gain.setTargetAtTime(musicLevel(),AC.currentTime,.2); }
   if(dev)document.getElementById("dev").textContent="z"+G.zombies.length+" k"+G.kills+" hp"+G.hp+" p"+G.parts.length+" L"+FL.length; }
 build(); requestAnimationFrame(frame);
 const DBG=document.createElement("canvas");
-window.SS={ CR, HR, vehHit, rig:(name,c,M)=>{ if(!crReady(name))return null; return catRig(name,c||{spd:0,gait:0},M||3,DBG); }, rebuild:(name)=>{ delete CR.rigs[name]; return crReady(name); }, style:(n)=>{STYLE=n;}, hold:(v)=>{HOLD=!!v;}, get G(){return G;}, get lv(){return LV;}, goto:(n)=>{ LV=n; LVSAVE=n>0?{}:null; build({}); G.card=3.6; MODE="play"; }, get mode(){return MODE;}, get zoom(){return ZOOM;}, get paused(){return userPaused;}, resume:()=>{userPaused=false;}, reset:start, start, setZoom, pickPerk,
+window.SS={ CR, HR, vehHit, platTop, BKILL, bigfin:(ki)=>{ const p=G.p, px=p.x+p.w/2; let b=null, bd=1e9; for(const z of G.zombies){ if(z.dead||(!z.boss&&z.tier!==3)||z.thrown||z.carried||z.emT>0||z.fly)continue; const d=Math.abs(z.x+z.w/2-px); if(d<bd){ bd=d; b=z; } } if(b&&!G.fin)startFin(b,ki); return !!G.fin; }, SKILL, sfin:(i)=>{ const S=G.stealth; if(!S||!S.tgt||G.fin)return false; startFin(S.tgt,null,0,3,SKILL[i]); S.kills++; return true; }, roll:()=>{ ROLLREQ=1; }, FKILL, FOPEN, CKILL, catDo:(ki)=>{ const bc=G.bigCat; if(!bc||bc.act||!(G.p.vicious>0))return false; let b=null, bd=1e9; for(const z of G.zombies){ if(z.dead||z.thrown||z.emT>0||z.fly||z.carried)continue; const d=Math.abs(z.x+z.w/2-bc.x); if(d<bd){ bd=d; b=z; } } if(!b)return false; catActStart(bc,b,ki); return true; }, fin:(k,o,c)=>{ const p=G.p, px=p.x+p.w/2; let b=null, bd=1e9; for(const z of G.zombies){ if(z.dead||z.boss||z.tier>2||z.thrown||z.carried||z.emT>0||z.fly)continue; const d=Math.abs(z.x+z.w/2-px); if(d<bd){ bd=d; b=z; } } if(b&&!G.fin)startFin(b,k,o,c); return !!G.fin; }, rig:(name,c,M)=>{ if(!crReady(name))return null; return catRig(name,c||{spd:0,gait:0},M||3,DBG); }, rebuild:(name)=>{ delete CR.rigs[name]; return crReady(name); }, style:(n)=>{STYLE=n;}, hold:(v)=>{HOLD=!!v;}, get G(){return G;}, get lv(){return LV;}, goto:(n)=>{ LV=n; LVSAVE=n>0?{}:null; build({}); G.card=3.6; MODE="play"; }, get mode(){return MODE;}, get zoom(){return ZOOM;}, get paused(){return userPaused;}, resume:()=>{userPaused=false;}, reset:start, start, setZoom, pickPerk,
   step:(n)=>{ for(let i=0;i<(n||1);i++){ if(G.perk)break; update(1/60); } present(); }, tick:()=>{ if(!G.perk)update(1/60); }, draw:present };
 </script>
 </body>
